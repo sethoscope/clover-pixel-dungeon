@@ -67,7 +67,7 @@ public class WandOfAntiMagic extends Wand {
 	}
 	
 	private void debuffEnemy( Mob enemy ) {
-                Buff.prolong(enemy, AntiMagic.class, 6 + buffedLvl()*3);
+                Buff.prolong(enemy, AntiMagic.class, 3 + buffedLvl()*1);
 	}
 	
 	@Override
