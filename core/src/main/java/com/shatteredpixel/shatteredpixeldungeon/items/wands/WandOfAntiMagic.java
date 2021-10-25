@@ -57,13 +57,6 @@ public class WandOfAntiMagic extends Wand {
 			}
 
 			Mob enemy = (Mob) ch;
-			float corruptingPower = 3 + buffedLvl()/2f;
-			
-			//base enemy resistance is usually based on their exp, but in special cases it is based on other criteria
-			float enemyResist = 1 + enemy.EXP;
-			
-			//100% health: 5x resist   75%: 3.25x resist   50%: 2x resist   25%: 1.25x resist
-			enemyResist *= 1 + 4*Math.pow(enemy.HP/(float)enemy.HT, 2);
                         debuffEnemy( enemy );
 			wandProc(ch, chargesPerCast());
 			Sample.INSTANCE.play( Assets.Sounds.HIT_MAGIC, 1, 0.8f * Random.Float(0.87f, 1.15f) );
