@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.mobs;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AntiMagic;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Hex;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Vulnerable;
@@ -68,7 +69,9 @@ public abstract class Shaman extends Mob {
 	
 	@Override
 	protected boolean canAttack( Char enemy ) {
-		return new Ballistica( pos, enemy.pos, Ballistica.MAGIC_BOLT).collisionPos == enemy.pos;
+                return (Dungeon.level.adjacent( pos, enemy.pos )
+                        || (buff( AntiMagic.class ) == null)
+                        && new Ballistica( pos, enemy.pos, Ballistica.MAGIC_BOLT).collisionPos == enemy.pos);
 	}
 
 	@Override
@@ -86,13 +89,12 @@ public abstract class Shaman extends Mob {
 	}
 
 	protected boolean doAttack(Char enemy ) {
-		
 		if (Dungeon.level.adjacent( pos, enemy.pos )) {
-			
 			return super.doAttack( enemy );
-			
 		} else {
-			
+                    if (buff( AntiMagic.class ) != null) {
+                        return false;
+                    } else {
 			if (sprite != null && (sprite.visible || enemy.sprite.visible)) {
 				sprite.zap( enemy.pos );
 				return false;
@@ -100,6 +102,7 @@ public abstract class Shaman extends Mob {
 				zap();
 				return true;
 			}
+                    }
 		}
 	}
 	
