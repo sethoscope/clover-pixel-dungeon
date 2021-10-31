@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.mobs;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AntiMagic;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Degrade;
 import com.shatteredpixel.shatteredpixeldungeon.items.Generator;
@@ -74,7 +75,9 @@ public class Warlock extends Mob implements Callback {
 	
 	@Override
 	protected boolean canAttack( Char enemy ) {
-		return new Ballistica( pos, enemy.pos, Ballistica.MAGIC_BOLT).collisionPos == enemy.pos;
+		return (Dungeon.level.adjacent( pos, enemy.pos )
+			|| (buff( AntiMagic.class ) == null)
+			&& new Ballistica( pos, enemy.pos, Ballistica.MAGIC_BOLT).collisionPos == enemy.pos);
 	}
 	
 	protected boolean doAttack( Char enemy ) {
@@ -83,6 +86,8 @@ public class Warlock extends Mob implements Callback {
 			
 			return super.doAttack( enemy );
 			
+		} else if (buff( AntiMagic.class ) != null) {
+			return false;
 		} else {
 			
 			if (sprite != null && (sprite.visible || enemy.sprite.visible)) {
