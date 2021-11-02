@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.mobs;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AntiMagic;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Light;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.PurpleParticle;
@@ -86,16 +87,19 @@ public class Eye extends Mob {
 	@Override
 	protected boolean canAttack( Char enemy ) {
 
-		if (beamCooldown == 0) {
+		if (buff( AntiMagic.class ) != null)
+			beamCharged = false;
+		if (beamCooldown == 0 && buff( AntiMagic.class ) == null) {
 			Ballistica aim = new Ballistica(pos, enemy.pos, Ballistica.STOP_SOLID);
 
 			if (enemy.invisible == 0 && !isCharmedBy(enemy) && fieldOfView[enemy.pos] && aim.subPath(1, aim.dist).contains(enemy.pos)){
 				beam = aim;
 				beamTarget = aim.collisionPos;
 				return true;
-			} else
+			} else {
 				//if the beam is charged, it has to attack, will aim at previous location of target.
 				return beamCharged;
+			}
 		} else
 			return super.canAttack(enemy);
 	}
@@ -118,7 +122,7 @@ public class Eye extends Mob {
 	@Override
 	protected boolean doAttack( Char enemy ) {
 
-		if (beamCooldown > 0) {
+		if (beamCooldown > 0 || buff( AntiMagic.class ) != null) {
 			return super.doAttack(enemy);
 		} else if (!beamCharged){
 			((EyeSprite)sprite).charge( enemy.pos );
@@ -131,7 +135,8 @@ public class Eye extends Mob {
 			
 			beam = new Ballistica(pos, beamTarget, Ballistica.STOP_SOLID);
 			if (Dungeon.level.heroFOV[pos] || Dungeon.level.heroFOV[beam.collisionPos] ) {
-				sprite.zap( beam.collisionPos );
+				if ( buff( AntiMagic.class ) == null )
+					sprite.zap( beam.collisionPos );
 				return false;
 			} else {
 				sprite.idle();
@@ -157,6 +162,10 @@ public class Eye extends Mob {
 
 		beamCharged = false;
 		beamCooldown = Random.IntRange(4, 6);
+
+		if ( buff( AntiMagic.class ) != null ) {
+		  return;
+		}
 
 		boolean terrainAffected = false;
 

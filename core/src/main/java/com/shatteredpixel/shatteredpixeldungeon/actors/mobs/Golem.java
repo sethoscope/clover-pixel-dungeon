@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.mobs;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AntiMagic;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.MagicImmune;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.Imp;
@@ -120,13 +121,15 @@ public class Golem extends Mob {
 		selfTeleCooldown--;
 		enemyTeleCooldown--;
 		if (teleporting){
-			((GolemSprite)sprite).teleParticles(false);
-			if (Actor.findChar(target) == null && Dungeon.level.openSpace[target]) {
-				ScrollOfTeleportation.appear(this, target);
-				selfTeleCooldown = 30;
-			} else {
-				target = Dungeon.level.randomDestination(this);
+			if (buff( AntiMagic.class ) == null) {
+				if (Actor.findChar(target) == null && Dungeon.level.openSpace[target]) {
+					ScrollOfTeleportation.appear(this, target);
+					selfTeleCooldown = 30;
+				} else {
+					target = Dungeon.level.randomDestination(this);
+				}
 			}
+                        ((GolemSprite)sprite).teleParticles(false);
 			teleporting = false;
 			spend(TICK);
 			return true;
@@ -151,7 +154,7 @@ public class Golem extends Mob {
 			}
 		}
 
-		if (enemy.buff(MagicImmune.class) != null){
+		if ((enemy.buff(MagicImmune.class) != null) || (buff( AntiMagic.class ) != null)) {
 			bestPos = enemy.pos;
 		}
 
@@ -176,7 +179,8 @@ public class Golem extends Mob {
 			if (target != -1 && getCloser( target )) {
 				spend( 1 / speed() );
 				return moveSprite( oldPos, pos );
-			} else if (!Dungeon.bossLevel() && target != -1 && target != pos && selfTeleCooldown <= 0) {
+			} else if (!Dungeon.bossLevel() && target != -1 && target != pos && selfTeleCooldown <= 0
+				   && (buff( AntiMagic.class ) == null)) {
 				((GolemSprite)sprite).teleParticles(true);
 				teleporting = true;
 				spend( 2*TICK );
@@ -206,9 +210,11 @@ public class Golem extends Mob {
 					if (sprite != null && (sprite.visible || enemy.sprite.visible)) {
 						sprite.zap( enemy.pos );
 						return false;
-					} else {
+					} else if (buff( AntiMagic.class ) == null) {
 						teleportEnemy();
 						return true;
+					} else {
+						return false;					       
 					}
 
 				} else if (getCloser( target )) {
@@ -219,9 +225,11 @@ public class Golem extends Mob {
 					if (sprite != null && (sprite.visible || enemy.sprite.visible)) {
 						sprite.zap( enemy.pos );
 						return false;
-					} else {
+					} else if (buff( AntiMagic.class ) == null) {
 						teleportEnemy();
 						return true;
+					} else {
+						return false;
 					}
 
 				} else {

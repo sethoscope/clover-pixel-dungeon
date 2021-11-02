@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AntiMagic;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Barrier;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Charm;
@@ -87,7 +88,7 @@ public class Succubus extends Mob {
 				sprite.emitter().burst( Speck.factory( Speck.HEALING ), 2 );
 				Sample.INSTANCE.play( Assets.Sounds.CHARMS );
 			}
-		} else if (Random.Int( 3 ) == 0) {
+		} else if (Random.Int( 3 ) == 0 && buff( AntiMagic.class ) == null) {
 			Charm c = Buff.affect( enemy, Charm.class, Charm.DURATION/2f );
 			c.object = id();
 			c.ignoreNextHit = true; //so that the -5 duration from succubus hit is ignored
@@ -102,7 +103,7 @@ public class Succubus extends Mob {
 	
 	@Override
 	protected boolean getCloser( int target ) {
-		if (fieldOfView[target] && Dungeon.level.distance( pos, target ) > 2 && blinkCooldown <= 0) {
+		if (fieldOfView[target] && Dungeon.level.distance( pos, target ) > 2 && blinkCooldown <= 0 && buff( AntiMagic.class ) == null) {
 			
 			blink( target );
 			spend( -1 / speed() );

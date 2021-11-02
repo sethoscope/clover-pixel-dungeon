@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.mobs;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AntiMagic;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Adrenaline;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AllyBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
@@ -179,6 +180,10 @@ public class Necromancer extends Mob {
 	}
 
 	public void summonMinion(){
+		if ( buff( AntiMagic.class ) != null ) {
+			return;
+		}
+
 		if (Actor.findChar(summoningPos) != null) {
 			int pushPos = pos;
 			for (int c : PathFinder.NEIGHBOURS8) {
@@ -253,14 +258,15 @@ public class Necromancer extends Mob {
 			}
 			
 			//if enemy is seen, and enemy is within range, and we haven no skeleton, summon a skeleton!
-			if (enemySeen && Dungeon.level.distance(pos, enemy.pos) <= 4 && mySkeleton == null){
+			if ((enemySeen && Dungeon.level.distance(pos, enemy.pos) <= 4 && mySkeleton == null)
+			    && buff( AntiMagic.class ) == null) {
 				
 				summoningPos = -1;
 				for (int c : PathFinder.NEIGHBOURS8){
 					if (Actor.findChar(enemy.pos+c) == null
 							&& Dungeon.level.passable[enemy.pos+c]
 							&& fieldOfView[enemy.pos+c]
-							&& Dungeon.level.trueDistance(pos, enemy.pos+c) < Dungeon.level.trueDistance(pos, summoningPos)){
+							&& Dungeon.level.trueDistance(pos, enemy.pos+c) < Dungeon.level.trueDistance(pos, summoningPos)) {
 						summoningPos = enemy.pos+c;
 					}
 				}
@@ -287,7 +293,8 @@ public class Necromancer extends Mob {
 					
 					//if the skeleton is not next to the enemy
 					//teleport them to the closest spot next to the enemy that can be seen
-					if (!Dungeon.level.adjacent(mySkeleton.pos, enemy.pos)){
+					if (!Dungeon.level.adjacent(mySkeleton.pos, enemy.pos)
+					    && buff( AntiMagic.class ) == null ) {
 						int telePos = -1;
 						for (int c : PathFinder.NEIGHBOURS8){
 							if (Actor.findChar(enemy.pos+c) == null
@@ -317,7 +324,8 @@ public class Necromancer extends Mob {
 				} else {
 					
 					//zap skeleton
-					if (mySkeleton.HP < mySkeleton.HT || mySkeleton.buff(Adrenaline.class) == null) {
+					if ((mySkeleton.HP < mySkeleton.HT || mySkeleton.buff(Adrenaline.class) == null)
+					    && buff( AntiMagic.class ) == null ) {
 						if (sprite != null && sprite.visible){
 							sprite.zap(mySkeleton.pos);
 							return false;

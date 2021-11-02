@@ -4,6 +4,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AllyBuff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AntiMagic;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ChampionEnemy;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Corruption;
@@ -81,6 +82,11 @@ public class SpectralNecromancer extends Necromancer {
 
 	@Override
 	public void summonMinion() {
+		if ( buff( AntiMagic.class ) != null ) {
+                        summoning = false;
+                        ((SpectralNecromancerSprite) sprite).cancelSummoning();
+			return;
+		}
 		if (Actor.findChar(summoningPos) != null) {
 			int pushPos = pos;
 			for (int c : PathFinder.NEIGHBOURS8) {
