@@ -35,7 +35,7 @@ public class AntiMagic extends FlavourBuff {
 
 	@Override
 	public int icon() {
-		return BuffIndicator.IMMUNITY;
+		return BuffIndicator.ANTIMAGIC;
 	}
 
 	@Override
