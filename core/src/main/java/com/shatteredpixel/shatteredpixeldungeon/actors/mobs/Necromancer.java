@@ -181,6 +181,8 @@ public class Necromancer extends Mob {
 
 	public void summonMinion(){
 		if ( buff( AntiMagic.class ) != null ) {
+ 			summoning = false;   // interrupted!
+			((NecromancerSprite)sprite).finishSummoning();
 			return;
 		}
 
