@@ -28,6 +28,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Challenges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AntiMagic;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Barrier;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Doom;
@@ -138,6 +139,11 @@ public class DwarfKing extends Mob {
 
 	@Override
 	protected boolean act() {
+		if ( buff( AntiMagic.class ) != null ) {
+			yell(Messages.get(this, "anti_magic"));
+			buff( AntiMagic.class ).detach();
+		}
+
 		if (phase == 1) {
 
 			if (summonCooldown <= 0 && summonSubject(Dungeon.isChallenged(Challenges.STRONGER_BOSSES) ? 2 : 3)){

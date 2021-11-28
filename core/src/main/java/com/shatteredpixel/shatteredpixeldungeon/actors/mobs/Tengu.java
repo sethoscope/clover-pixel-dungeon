@@ -30,6 +30,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Blob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Electricity;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Fire;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AntiMagic;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Blindness;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Burning;
@@ -81,6 +82,8 @@ import java.util.HashSet;
 
 public class Tengu extends Mob {
 	
+	private int jump_countdown;
+
 	{
 		spriteClass = TenguSprite.class;
 		
@@ -95,6 +98,7 @@ public class Tengu extends Mob {
 		properties.add(Property.BOSS);
 		
 		viewDistance = 12;
+		jump_countdown = 0;
 	}
 	
 	@Override
@@ -104,6 +108,7 @@ public class Tengu extends Mob {
 			timeToNow();
 			spendToWhole();
 		}
+		jump_countdown = 0;
 		super.onAdd();
 	}
 	
@@ -224,7 +229,13 @@ public class Tengu extends Mob {
 	}
 	
 	private void jump() {
-		
+		if ( buff( AntiMagic.class ) != null ) {
+			yell(Messages.get(this, "anti_magic"));
+			buff( AntiMagic.class ).detach();
+			jump_countdown = 2;
+			return;
+		}
+
 		//in case tengu hasn't had a chance to act yet
 		if (fieldOfView == null || fieldOfView.length != Dungeon.level.length()){
 			fieldOfView = new boolean[Dungeon.level.length()];
@@ -374,6 +385,13 @@ public class Tengu extends Mob {
 		
 		@Override
 		public boolean act(boolean enemyInFOV, boolean justAlerted) {
+			if ( jump_countdown > 0 ) { // a jump was delayed for anti-magic
+				jump_countdown--;
+				if ( jump_countdown == 0 ) {
+					jump();
+					return true;
+				}
+			}
 			
 			enemySeen = enemyInFOV;
 			if (enemyInFOV && !isCharmedBy( enemy ) && canAttack( enemy )) {
