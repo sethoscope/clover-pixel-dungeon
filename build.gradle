@@ -12,7 +12,7 @@ allprojects {
 
     ext {
         appName = 'Shattered Pixel Dungeon'
-        appPackageName = 'com.shatteredpixel.shatteredpixeldungeon'
+        appPackageName = 'org.fogplex.cloverpixeldungeon'
 
         appVersionCode = 610
         appVersionName = '1.2.0'
