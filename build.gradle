@@ -4,8 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.3'
-        classpath 'com.mobidevelop.robovm:robovm-gradle-plugin:2.3.13'
+        classpath 'com.android.tools.build:gradle:7.0.4'
     }
 }
 
@@ -15,8 +14,8 @@ allprojects {
         appName = 'Shattered Pixel Dungeon'
         appPackageName = 'com.shatteredpixel.shatteredpixeldungeon'
 
-        appVersionCode = 586
-        appVersionName = '1.1.1'
+        appVersionCode = 610
+        appVersionName = '1.2.0'
 
         appJavaCompatibility = JavaVersion.VERSION_1_8
 
@@ -25,6 +24,7 @@ allprojects {
         appAndroidTargetSDK = 31
 
         gdxVersion = '1.10.0'
+        gdxControllersVersion = '2.2.1'
         robovmVersion = '2.3.14'
     }
     version = appVersionName

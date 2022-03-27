@@ -3,7 +3,7 @@
  * Copyright (C) 2012-2015 Oleg Dolya
  *
  * Shattered Pixel Dungeon
- * Copyright (C) 2014-2021 Evan Debenham
+ * Copyright (C) 2014-2022 Evan Debenham
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ public class Succubus extends Mob {
 	
 	@Override
 	public int damageRoll() {
-		return Random.NormalIntRange( 25, 30 );
+		return Random.NormalIntRange( 2, 3 );
 	}
 	
 	@Override
@@ -105,9 +105,12 @@ public class Succubus extends Mob {
 	protected boolean getCloser( int target ) {
 		if (fieldOfView[target] && Dungeon.level.distance( pos, target ) > 2 && blinkCooldown <= 0 && buff( AntiMagic.class ) == null) {
 			
-			blink( target );
-			spend( -1 / speed() );
-			return true;
+			if (blink( target )) {
+				spend(-1 / speed());
+				return true;
+			} else {
+				return false;
+			}
 			
 		} else {
 
@@ -117,7 +120,7 @@ public class Succubus extends Mob {
 		}
 	}
 	
-	private void blink( int target ) {
+	private boolean blink( int target ) {
 		
 		Ballistica route = new Ballistica( pos, target, Ballistica.PROJECTILE);
 		int cell = route.collisionPos;
@@ -126,7 +129,7 @@ public class Succubus extends Mob {
 		if (Actor.findChar( cell ) != null && cell != this.pos)
 			cell = route.path.get(route.dist-1);
 
-		if (Dungeon.level.avoid[ cell ] && (!properties().contains(Property.LARGE) || Dungeon.level.openSpace[cell])){
+		if (Dungeon.level.avoid[ cell ] || (properties().contains(Property.LARGE) && !Dungeon.level.openSpace[cell])){
 			ArrayList<Integer> candidates = new ArrayList<>();
 			for (int n : PathFinder.NEIGHBOURS8) {
 				cell = route.collisionPos + n;
@@ -140,13 +143,14 @@ public class Succubus extends Mob {
 				cell = Random.element(candidates);
 			else {
 				blinkCooldown = Random.IntRange(4, 6);
-				return;
+				return false;
 			}
 		}
 		
 		ScrollOfTeleportation.appear( this, cell );
 
 		blinkCooldown = Random.IntRange(4, 6);
+		return true;
 	}
 	
 	@Override
@@ -160,7 +164,7 @@ public class Succubus extends Mob {
 	}
 
 	@Override
-	protected Item createLoot() {
+	public Item createLoot() {
 		Class<?extends Scroll> loot;
 		do{
 			loot = (Class<? extends Scroll>) Random.oneOf(Generator.Category.SCROLL.classes);
