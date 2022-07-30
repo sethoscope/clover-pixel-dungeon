@@ -98,7 +98,10 @@ public class SpectralNecromancer extends Necromancer {
 	@Override
 	public void restoreFromBundle(Bundle bundle) {
 		super.restoreFromBundle(bundle);
-		Collections.addAll(wraithIDs, bundle.getInt(WRAITH_IDS));
+		wraithIDs.clear();
+		for (int i : bundle.getIntArray(WRAITH_IDS)){
+			wraithIDs.add(i);
+		}
 	}
 
 	@Override

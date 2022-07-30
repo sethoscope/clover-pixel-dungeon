@@ -26,6 +26,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Adrenaline;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AllyBuff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
@@ -55,6 +56,9 @@ public class Ratmogrify extends ArmorAbility {
 	{
 		baseChargeUse = 50f;
 	}
+
+	//this is sort of hacky, but we need it to know when to use alternate name/icon for heroic energy
+	public static boolean useRatroicEnergy = false;
 
 	@Override
 	public String targetingPrompt() {
@@ -186,6 +190,10 @@ public class Ratmogrify extends ArmorAbility {
 
 		}
 
+		public Mob getOriginal(){
+			return original;
+		}
+
 		private float timeLeft = 6f;
 
 		@Override
@@ -196,6 +204,7 @@ public class Ratmogrify extends ArmorAbility {
 				original.clearTime();
 				GameScene.add(original);
 
+				EXP = 0;
 				destroy();
 				sprite.killAndErase();
 				CellEmitter.get(original.pos).burst(Speck.factory(Speck.WOOL), 4);
@@ -249,6 +258,10 @@ public class Ratmogrify extends ArmorAbility {
 		@Override
 		public String name() {
 			return Messages.get(this, "name", original.name());
+		}
+
+		{
+			immunities.add(AllyBuff.class);
 		}
 
 		private static final String ORIGINAL = "original";
