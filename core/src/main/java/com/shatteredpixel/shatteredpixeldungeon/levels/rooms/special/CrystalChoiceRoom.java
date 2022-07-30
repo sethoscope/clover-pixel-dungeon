@@ -123,10 +123,12 @@ public class CrystalChoiceRoom extends SpecialRoom {
 		Item hidden = Generator.random(Random.oneOf(
 				Generator.Category.WAND,
 				Generator.Category.RING,
-				Generator.Category.ARTIFACT,
-				Generator.Category.GOLD     //*evil laughter*
+				Generator.Category.ARTIFACT
 		));
-		level.drop(hidden, level.pointToCell(room2.center())).type = Heap.Type.CHEST;
+		Heap chest = level.drop(hidden, level.pointToCell(room2.center()));
+		chest.type = Heap.Type.CHEST;
+		//opening the chest is optional, so it doesn't count for exploration bonus
+		chest.autoExplored = true;
 
 		level.addItemToSpawn( new CrystalKey( Dungeon.depth ) );
 

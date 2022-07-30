@@ -156,26 +156,26 @@ public class ShopRoom extends SpecialRoom {
 		switch (Dungeon.depth) {
 		case 6: default:
 			w = (MeleeWeapon) Generator.random(Generator.wepTiers[1]);
-			itemsToSpawn.add( Generator.random(Generator.misTiers[1]).quantity(2).identify() );
-			itemsToSpawn.add( new LeatherArmor().identify() );
+			itemsToSpawn.add( Generator.random(Generator.misTiers[1]).quantity(2).identify(false) );
+			itemsToSpawn.add( new LeatherArmor().identify(false) );
 			break;
 			
 		case 11:
 			w = (MeleeWeapon) Generator.random(Generator.wepTiers[2]);
-			itemsToSpawn.add( Generator.random(Generator.misTiers[2]).quantity(2).identify() );
-			itemsToSpawn.add( new MailArmor().identify() );
+			itemsToSpawn.add( Generator.random(Generator.misTiers[2]).quantity(2).identify(false) );
+			itemsToSpawn.add( new MailArmor().identify(false) );
 			break;
 			
 		case 16:
 			w = (MeleeWeapon) Generator.random(Generator.wepTiers[3]);
-			itemsToSpawn.add( Generator.random(Generator.misTiers[3]).quantity(2).identify() );
-			itemsToSpawn.add( new ScaleArmor().identify() );
+			itemsToSpawn.add( Generator.random(Generator.misTiers[3]).quantity(2).identify(false) );
+			itemsToSpawn.add( new ScaleArmor().identify(false) );
 			break;
 
 		case 20: case 21:
 			w = (MeleeWeapon) Generator.random(Generator.wepTiers[4]);
-			itemsToSpawn.add( Generator.random(Generator.misTiers[4]).quantity(2).identify() );
-			itemsToSpawn.add( new PlateArmor().identify() );
+			itemsToSpawn.add( Generator.random(Generator.misTiers[4]).quantity(2).identify(false) );
+			itemsToSpawn.add( new PlateArmor().identify(false) );
 			itemsToSpawn.add( new Torch() );
 			itemsToSpawn.add( new Torch() );
 			itemsToSpawn.add( new Torch() );
@@ -184,7 +184,7 @@ public class ShopRoom extends SpecialRoom {
 		w.enchant(null);
 		w.cursed = false;
 		w.level(0);
-		w.identify();
+		w.identify(false);
 		itemsToSpawn.add(w);
 		
 		itemsToSpawn.add( TippedDart.randomTipped(2) );
@@ -270,10 +270,12 @@ public class ShopRoom extends SpecialRoom {
 		itemsToSpawn.add( rare );
 
 		//hard limit is 63 items + 1 shopkeeper, as shops can't be bigger than 8x8=64 internally
-		if (itemsToSpawn.size() > 63)
+		if (itemsToSpawn.size() > 63) {
 			throw new RuntimeException("Shop attempted to carry more than 63 items!");
+		}
 
 		//use a new generator here to prevent items in shop stock affecting levelgen RNG (e.g. sandbags)
+		//we can use a random long for the seed as it will be the same long every time
 		Random.pushGenerator(Random.Long());
 			Random.shuffle(itemsToSpawn);
 		Random.popGenerator();

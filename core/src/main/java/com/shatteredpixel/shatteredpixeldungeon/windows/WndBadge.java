@@ -30,7 +30,7 @@ import com.watabou.noosa.Image;
 
 public class WndBadge extends Window {
 	
-	private static final int WIDTH = 120;
+	private static final int MAX_WIDTH = 125;
 	private static final int MARGIN = 4;
 	
 	public WndBadge( Badges.Badge badge, boolean unlocked ) {
@@ -43,14 +43,26 @@ public class WndBadge extends Window {
 		add( icon );
 
 		RenderedTextBlock title = PixelScene.renderTextBlock( badge.title(), 9 );
+		title.maxWidth(MAX_WIDTH - MARGIN * 2);
+		title.align(RenderedTextBlock.CENTER_ALIGN);
 		title.hardlight(TITLE_COLOR);
 		if (!unlocked) title.hardlight( 0x888822 );
 		add(title);
 
-		RenderedTextBlock info = PixelScene.renderTextBlock( badge.desc(), 6 );
-		info.maxWidth(WIDTH - MARGIN * 2);
+		String desc = badge.desc();
+		String unlock = Badges.showCompletionProgress(badge);
+
+		if (unlock != null){
+			desc += unlock;
+		}
+
+		RenderedTextBlock info = PixelScene.renderTextBlock( desc, 6 );
+		info.maxWidth(MAX_WIDTH - MARGIN * 2);
 		info.align(RenderedTextBlock.CENTER_ALIGN);
-		if (!unlocked) info.hardlight( 0x888888 );
+		if (!unlocked) {
+			info.hardlight( 0x888888 );
+			info.setHightlighting( true, 0x888822 );
+		}
 		add(info);
 		
 		float w = Math.max( icon.width(), Math.max(title.width(), info.width()) ) + MARGIN * 2;

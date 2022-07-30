@@ -24,7 +24,9 @@ package com.shatteredpixel.shatteredpixeldungeon.scenes;
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Challenges;
+import com.shatteredpixel.shatteredpixeldungeon.Chrome;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.GamesInProgress;
 import com.shatteredpixel.shatteredpixeldungeon.Rankings;
 import com.shatteredpixel.shatteredpixeldungeon.SPDSettings;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
@@ -32,6 +34,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Blob;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AscensionChallenge;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ChampionEnemy;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
@@ -90,6 +93,7 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.QuickSlotButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.ResumeIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.ui.RightClickMenu;
 import com.shatteredpixel.shatteredpixeldungeon.ui.StatusPane;
+import com.shatteredpixel.shatteredpixeldungeon.ui.StyledButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Tag;
 import com.shatteredpixel.shatteredpixeldungeon.ui.TargetHealthIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Toast;
@@ -104,6 +108,7 @@ import com.shatteredpixel.shatteredpixeldungeon.windows.WndInfoItem;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndInfoMob;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndInfoPlant;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndInfoTrap;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndKeyBindings;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndMessage;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndResurrect;
@@ -281,9 +286,6 @@ public class GameScene extends PixelScene {
 		
 		for (Mob mob : Dungeon.level.mobs) {
 			addMobSprite( mob );
-			if (Statistics.amuletObtained) {
-				mob.beckon( Dungeon.hero.pos );
-			}
 		}
 		
 		raisedTerrain = new RaisedTerrainTilemap();
@@ -522,7 +524,8 @@ public class GameScene extends PixelScene {
 				}
 
 				//50%/75% chance, use level's seed so that we get the same result for the same level
-				Random.pushGenerator(Dungeon.seedCurDepth());
+				//offset seed slightly to avoid output patterns
+				Random.pushGenerator(Dungeon.seedCurDepth()+1);
 					if (reqSecrets <= 0 && Random.Int(4) <= Dungeon.hero.pointsInTalent(Talent.ROGUES_FORESIGHT)){
 						GLog.p(Messages.get(this, "secret_hint"));
 					}
@@ -559,6 +562,11 @@ public class GameScene extends PixelScene {
 				}
 			}
 
+			if (Dungeon.hero.buff(AscensionChallenge.class) != null
+				&& Dungeon.depth == Statistics.highestAscent){
+				Dungeon.hero.buff(AscensionChallenge.class).saySwitch();
+			}
+
 			InterlevelScene.mode = InterlevelScene.Mode.NONE;
 
 			
@@ -581,8 +589,10 @@ public class GameScene extends PixelScene {
 					ankh = i;
 				}
 			}
-			if (ankh != null) {
+			if (ankh != null && GamesInProgress.gameExists(GamesInProgress.curSlot)) {
 				add(new WndResurrect(ankh));
+			} else {
+				gameOver();
 			}
 		}
 
@@ -766,9 +776,13 @@ public class GameScene extends PixelScene {
 		float tagWidth = Tag.SIZE + (tagsOnLeft ? insets.left : insets.right);
 		float tagLeft = tagsOnLeft ? 0 : uiCamera.width - tagWidth;
 
+		float invWidth = (scene.inventory != null && scene.inventory.visible) ? scene.inventory.width() : 0;
+
 		float y = SPDSettings.interfaceSize() == 0 ? scene.toolbar.top()-2 : scene.status.top()-2;
 		if (tagsOnLeft) {
-			scene.log.setRect(tagWidth, y, uiCamera.width - tagWidth - insets.right, 0);
+			scene.log.setRect(tagWidth, y, uiCamera.width - tagWidth - insets.right - invWidth, 0);
+		} else if (invWidth > 0) {
+			scene.log.setRect(insets.left, y, uiCamera.width - invWidth, 0);
 		} else {
 			scene.log.setRect(insets.left, y, uiCamera.width - tagWidth - insets.left, 0);
 		}
@@ -869,14 +883,22 @@ public class GameScene extends PixelScene {
 			};
 			prompt.camera = uiCamera;
 			prompt.setPos( (uiCamera.width - prompt.width()) / 2, uiCamera.height - 60 );
+
+			if (inventory != null && inventory.visible && prompt.right() > inventory.left() - 10){
+				prompt.setPos(inventory.left() - prompt.width() - 10, prompt.top());
+			}
+
 			add( prompt );
 		}
 	}
 	
 	private void showBanner( Banner banner ) {
 		banner.camera = uiCamera;
+
+		float offset = Camera.main.centerOffset.y;
 		banner.x = align( uiCamera, (uiCamera.width - banner.width) / 2 );
-		banner.y = align( uiCamera, (uiCamera.height - banner.height) / 3 );
+		banner.y = align( uiCamera, (uiCamera.height - banner.height) / 2 - banner.height/2 - 16 - offset );
+
 		addToFront( banner );
 	}
 	
@@ -903,6 +925,8 @@ public class GameScene extends PixelScene {
 	
 	public static void add( Heap heap ) {
 		if (scene != null) {
+			//heaps that aren't added as part of levelgen don't count for exploration bonus
+			heap.autoExplored = true;
 			scene.addHeapSprite( heap );
 		}
 	}
@@ -915,8 +939,10 @@ public class GameScene extends PixelScene {
 	
 	public static void add( Mob mob ) {
 		Dungeon.level.mobs.add( mob );
-		scene.addMobSprite( mob );
-		Actor.add( mob );
+		if (scene != null) {
+			scene.addMobSprite(mob);
+			Actor.add(mob);
+		}
 	}
 
 	public static void addSprite( Mob mob ) {
@@ -1150,9 +1176,8 @@ public class GameScene extends PixelScene {
 	
 	public static void afterObserve() {
 		if (scene != null) {
-			for (Mob mob : Dungeon.level.mobs) {
-				if (mob.sprite != null)
-					mob.sprite.visible = Dungeon.level.heroFOV[mob.pos];
+			for (Mob mob : Dungeon.level.mobs.toArray(new Mob[0])) {
+				if (mob.sprite != null) mob.sprite.visible = Dungeon.level.heroFOV[mob.pos];
 			}
 		}
 	}
@@ -1171,11 +1196,59 @@ public class GameScene extends PixelScene {
 	}
 
 	public static void gameOver() {
+		if (scene == null) return;
+
 		Banner gameOver = new Banner( BannerSprites.get( BannerSprites.Type.GAME_OVER ) );
-		gameOver.show( 0x000000, 1f );
+		gameOver.show( 0x000000, 2f );
 		scene.showBanner( gameOver );
-		
-		Sample.INSTANCE.play( Assets.Sounds.DEATH );
+
+		StyledButton restart = new StyledButton(Chrome.Type.GREY_BUTTON_TR, Messages.get(StartScene.class, "new"), 9){
+			@Override
+			protected void onClick() {
+				InterlevelScene.noStory = true;
+				GamesInProgress.selectedClass = Dungeon.hero.heroClass;
+				GamesInProgress.curSlot = GamesInProgress.firstEmpty();
+				ShatteredPixelDungeon.switchScene(HeroSelectScene.class);
+			}
+
+			@Override
+			public void update() {
+				alpha(gameOver.am);
+				super.update();
+			}
+		};
+		restart.icon(Icons.get(Icons.ENTER));
+		restart.alpha(0);
+		restart.camera = uiCamera;
+		float offset = Camera.main.centerOffset.y;
+		restart.setSize(Math.max(80, restart.reqWidth()), 20);
+		restart.setPos(
+				align(uiCamera, (restart.camera.width - restart.width()) / 2),
+				align(uiCamera, (restart.camera.height - restart.height()) / 2 + restart.height()/2 + 16 - offset)
+		);
+		scene.add(restart);
+
+		StyledButton menu = new StyledButton(Chrome.Type.GREY_BUTTON_TR, Messages.get(WndKeyBindings.class, "menu"), 9){
+			@Override
+			protected void onClick() {
+				GameScene.show(new WndGame());
+			}
+
+			@Override
+			public void update() {
+				alpha(gameOver.am);
+				super.update();
+			}
+		};
+		menu.icon(Icons.get(Icons.PREFS));
+		menu.alpha(0);
+		menu.camera = uiCamera;
+		menu.setSize(Math.max(80, menu.reqWidth()), 20);
+		menu.setPos(
+				align(uiCamera, (menu.camera.width - menu.width()) / 2),
+				restart.bottom() + 2
+		);
+		scene.add(menu);
 	}
 	
 	public static void bossSlain() {

@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Challenges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Blob;
@@ -214,6 +215,10 @@ public class Tengu extends Mob {
 		super.die( cause );
 		
 		Badges.validateBossSlain();
+		if (Statistics.qualifiedForBossChallengeBadge){
+			Badges.validateBossChallengeCompleted();
+		}
+		Statistics.bossScores[1] += 2000;
 		
 		LloydsBeacon beacon = Dungeon.hero.belongings.getItem(LloydsBeacon.class);
 		if (beacon != null) {
@@ -623,15 +628,20 @@ public class Tengu extends Mob {
 					if (PathFinder.distance[cell] < Integer.MAX_VALUE) {
 						Char ch = Actor.findChar(cell);
 						if (ch != null && !(ch instanceof Tengu)) {
-							int dmg = Random.NormalIntRange(5 + Dungeon.depth, 10 + Dungeon.depth * 2);
+							int dmg = Random.NormalIntRange(5 + Dungeon.scalingDepth(), 10 + Dungeon.scalingDepth() * 2);
 							dmg -= ch.drRoll();
 
 							if (dmg > 0) {
 								ch.damage(dmg, Bomb.class);
 							}
 
-							if (ch == Dungeon.hero && !ch.isAlive()) {
-								Dungeon.fail(Tengu.class);
+							if (ch == Dungeon.hero){
+								Statistics.qualifiedForBossChallengeBadge = false;
+								Statistics.bossScores[1] -= 100;
+
+								if (!ch.isAlive()) {
+									Dungeon.fail(Tengu.class);
+								}
 							}
 						}
 
@@ -858,6 +868,10 @@ public class Tengu extends Mob {
 							if (ch != null && !ch.isImmune(Fire.class) && !(ch instanceof Tengu)) {
 								Buff.affect( ch, Burning.class ).reignite( ch );
 							}
+							if (ch == Dungeon.hero){
+								Statistics.qualifiedForBossChallengeBadge = false;
+								Statistics.bossScores[1] -= 100;
+							}
 							
 							if (Dungeon.level.flamable[cell]){
 								Dungeon.level.destroy( cell );
@@ -1037,11 +1051,15 @@ public class Tengu extends Mob {
 							
 							Char ch = Actor.findChar(cell);
 							if (ch != null && !(ch instanceof Tengu)){
-								ch.damage(2 + Dungeon.depth, new Electricity());
+								ch.damage(2 + Dungeon.scalingDepth(), new Electricity());
 								
-								if (ch == Dungeon.hero && !ch.isAlive()) {
-									Dungeon.fail(Tengu.class);
-									GLog.n( Messages.get(Electricity.class, "ondeath") );
+								if (ch == Dungeon.hero){
+									Statistics.qualifiedForBossChallengeBadge = false;
+									Statistics.bossScores[1] -= 100;
+									if (!ch.isAlive()) {
+										Dungeon.fail(Tengu.class);
+										GLog.n(Messages.get(Electricity.class, "ondeath"));
+									}
 								}
 							}
 							
