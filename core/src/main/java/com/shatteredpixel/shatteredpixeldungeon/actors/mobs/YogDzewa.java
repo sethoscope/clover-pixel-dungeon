@@ -32,6 +32,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Amok;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Charm;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Dread;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Frost;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Light;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.LockedFloor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Paralysis;
@@ -190,6 +191,7 @@ public class YogDzewa extends Mob {
 			yell(Messages.get(this, "hope"));
 			summonCooldown = -15; //summon a burst of minions!
 			phase = 5;
+			BossHealthBar.bleed(true);
 		}
 
 		if (phase == 0){
@@ -220,16 +222,18 @@ public class YogDzewa extends Mob {
 				if (terrainAffected) {
 					Dungeon.observe();
 				}
+				Invisibility.dispel(this);
 				for (Char ch : affected) {
+
+					if (ch == Dungeon.hero) {
+						Statistics.bossScores[4] -= 500;
+					}
 
 					if (hit( this, ch, true )) {
 						if (Dungeon.isChallenged(Challenges.STRONGER_BOSSES)) {
 							ch.damage(Random.NormalIntRange(30, 50), new Eye.DeathGaze());
 						} else {
 							ch.damage(Random.NormalIntRange(20, 30), new Eye.DeathGaze());
-						}
-						if (ch == Dungeon.hero) {
-							Statistics.bossScores[4] -= 500;
 						}
 						if (Dungeon.level.heroFOV[pos]) {
 							ch.sprite.flash();
@@ -590,7 +594,10 @@ public class YogDzewa extends Mob {
 	public void restoreFromBundle(Bundle bundle) {
 		super.restoreFromBundle(bundle);
 		phase = bundle.getInt(PHASE);
-		if (phase != 0) BossHealthBar.assignBoss(this);
+		if (phase != 0) {
+			BossHealthBar.assignBoss(this);
+			if (phase == 5) BossHealthBar.bleed(true);
+		}
 
 		abilityCooldown = bundle.getFloat(ABILITY_CD);
 		summonCooldown = bundle.getFloat(SUMMON_CD);

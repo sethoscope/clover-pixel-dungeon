@@ -143,7 +143,7 @@ public class BossHealthBar extends Component {
 		bossInfo.setRect(x, y, bar.width, bar.height);
 
 		if (buffs != null) {
-			buffs.setRect(hp.x, hp.y + 5, 110, 7);
+			buffs.setRect(hp.x, hp.y + 5, 47, 8);
 		}
 
 		skull.x = bar.x+5;
@@ -157,6 +157,12 @@ public class BossHealthBar extends Component {
 			if (!boss.isAlive() || !Dungeon.level.mobs.contains(boss)){
 				boss = null;
 				visible = active = false;
+				if (buffs != null) {
+					BuffIndicator.setBossInstance(null);
+					remove(buffs);
+					buffs.destroy();
+					buffs = null;
+				}
 			} else {
 
 				int health = boss.HP;
@@ -195,7 +201,8 @@ public class BossHealthBar extends Component {
 			instance.visible = instance.active = true;
 			if (boss != null){
 				if (instance.buffs != null){
-					instance.buffs.killAndErase();
+					instance.remove(instance.buffs);
+					instance.buffs.destroy();
 				}
 				instance.buffs = new BuffIndicator(boss, false);
 				BuffIndicator.setBossInstance(instance.buffs);

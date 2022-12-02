@@ -89,6 +89,11 @@ abstract public class ClassArmor extends Armor {
 		}
 	}
 
+	@Override
+	public int targetingPos(Hero user, int dst) {
+		return user.armorAbility.targetedPos(user, dst);
+	}
+
 	public static ClassArmor upgrade (Hero owner, Armor armor ) {
 		
 		ClassArmor classArmor = null;
@@ -224,6 +229,8 @@ abstract public class ClassArmor extends Armor {
 								cursed = armor.cursed;
 								curseInfusionBonus = armor.curseInfusionBonus;
 								masteryPotionBonus = armor.masteryPotionBonus;
+								if (armor.checkSeal() != null) seal = armor.checkSeal();
+
 								identify();
 
 								GLog.p( Messages.get(ClassArmor.class, "transfer_complete") );
@@ -271,6 +278,17 @@ abstract public class ClassArmor extends Armor {
 	}
 
 	public class Charger extends Buff {
+
+		@Override
+		public boolean attachTo( Char target ) {
+			if (super.attachTo( target )) {
+				//if we're loading in and the hero has partially spent a turn, delay for 1 turn
+				if (now() == 0 && cooldown() == 0 && target.cooldown() > 0) spend(TICK);
+				return true;
+			}
+			return false;
+		}
+
 		@Override
 		public boolean act() {
 			LockedFloor lock = target.buff(LockedFloor.class);

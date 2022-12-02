@@ -41,6 +41,7 @@ import com.watabou.noosa.tweeners.AlphaTweener;
 import com.watabou.noosa.ui.Component;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 
 public class BuffIndicator extends Component {
@@ -151,7 +152,9 @@ public class BuffIndicator extends Component {
 			layout();
 		}
 	}
-	
+
+	private boolean buffsHidden = false;
+
 	@Override
 	protected void layout() {
 
@@ -201,13 +204,44 @@ public class BuffIndicator extends Component {
 		
 		//layout
 		int pos = 0;
+		float lastIconLeft = 0;
 		for (BuffButton icon : buffButtons.values()){
 			icon.updateIcon();
 			//button areas are slightly oversized, especially on small buttons
-			icon.setRect(x + pos * (size + (large ? 1 : 2)), y, size + (large ? 1 : 2), size + (large ? 0 : 5));
+			icon.setRect(x + pos * (size + 1), y, size + 1, size + (large ? 0 : 5));
 			PixelScene.align(icon);
 			pos++;
+
+			icon.visible = icon.left() <= right();
+			lastIconLeft = icon.left();
 		}
+
+		buffsHidden = false;
+		//squish buff icons together if there isn't enough room
+		float excessWidth = lastIconLeft - right();
+		if (excessWidth > 0) {
+			float leftAdjust = excessWidth/(buffButtons.size()-1);
+			//can't squish by more than 50% on large and 62% on small
+			if (large && leftAdjust >= size*0.48f) leftAdjust = size*0.5f;
+			if (!large && leftAdjust >= size*0.62f) leftAdjust = size*0.65f;
+			float cumulativeAdjust = leftAdjust * (buffButtons.size()-1);
+
+			ArrayList<BuffButton> buttons = new ArrayList<>(buffButtons.values());
+			Collections.reverse(buttons);
+			for (BuffButton icon : buttons) {
+				icon.setPos(icon.left() - cumulativeAdjust, icon.top());
+				icon.visible = icon.left() <= right();
+				if (!icon.visible) buffsHidden = true;
+				PixelScene.align(icon);
+				bringToFront(icon);
+				icon.givePointerPriority();
+				cumulativeAdjust -= leftAdjust;
+			}
+		}
+	}
+
+	public boolean allBuffsVisible(){
+		return !buffsHidden;
 	}
 
 	private static class BuffButton extends IconButton {
@@ -219,7 +253,6 @@ public class BuffIndicator extends Component {
 		public Image grey; //only for small
 		public BitmapText text; //only for large
 
-		//TODO for large buffs there is room to have text instead of fading
 		public BuffButton( Buff buff, boolean large ){
 			super( new BuffIcon(buff, large));
 			this.buff = buff;
@@ -295,7 +328,7 @@ public class BuffIndicator extends Component {
 
 		@Override
 		protected String hoverText() {
-			return Messages.titleCase(buff.toString());
+			return Messages.titleCase(buff.name());
 		}
 	}
 	

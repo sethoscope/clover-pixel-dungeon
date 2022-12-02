@@ -125,6 +125,14 @@ public abstract class Wand extends Item {
 
 	public abstract void onHit( MagesStaff staff, Char attacker, Char defender, int damage);
 
+	//not affected by enchantment proc chance changers
+	public static float procChanceMultiplier( Char attacker ){
+		if (attacker.buff(Talent.EmpoweredStrikeTracker.class) != null){
+			return 1f + ((Hero)attacker).pointsInTalent(Talent.EMPOWERED_STRIKE)/2f;
+		}
+		return 1f;
+	}
+
 	public boolean tryToZap( Hero owner, int target ){
 
 		if (owner.buff(MagicImmune.class) != null){
@@ -388,6 +396,13 @@ public abstract class Wand extends Item {
 				Badges.validateItemLevelAquired( this );
 			}
 		}
+
+		//inside staff
+		if (charger != null && charger.target == Dungeon.hero && !Dungeon.hero.belongings.contains(this)){
+			if (Dungeon.hero.hasTalent(Talent.EXCESS_CHARGE) && curCharges >= maxCharges){
+				Buff.affect(Dungeon.hero, Barrier.class).setShield(Math.round(buffedLvl()*0.67f*Dungeon.hero.pointsInTalent(Talent.EXCESS_CHARGE)));
+			}
+		}
 		
 		curCharges -= cursed ? 1 : chargesPerCast();
 
@@ -533,7 +548,8 @@ public abstract class Wand extends Item {
 	}
 
 	public int collisionProperties(int target){
-		return collisionProperties;
+		if (cursed)     return Ballistica.MAGIC_BOLT;
+		else            return collisionProperties;
 	}
 
 	public static class PlaceHolder extends Wand {
@@ -648,12 +664,15 @@ public abstract class Wand extends Item {
 		private static final float CHARGE_BUFF_BONUS = 0.25f;
 
 		float scalingFactor = NORMAL_SCALE_FACTOR;
-		
+
 		@Override
 		public boolean attachTo( Char target ) {
-			super.attachTo( target );
-			
-			return true;
+			if (super.attachTo( target )) {
+				//if we're loading in and the hero has partially spent a turn, delay for 1 turn
+				if (now() == 0 && cooldown() == 0 && target.cooldown() > 0) spend(TICK);
+				return true;
+			}
+			return false;
 		}
 		
 		@Override
