@@ -28,6 +28,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.LockedFloor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Ooze;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
@@ -43,6 +44,7 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.BossHealthBar;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.Camera;
 import com.watabou.utils.Bundle;
+import com.watabou.utils.GameMath;
 import com.watabou.utils.PathFinder;
 import com.watabou.utils.Random;
 
@@ -99,9 +101,12 @@ public class Goo extends Mob {
 	@Override
 	public boolean act() {
 
+		if (state != HUNTING){
+			pumpedUp = 0;
+		}
+
 		if (Dungeon.level.water[pos] && HP < HT) {
 			HP += healInc;
-			Statistics.bossScores[0] -= 10;
 			Statistics.qualifiedForBossChallengeBadge = false;
 
 			LockedFloor lock = Dungeon.hero.buff(LockedFloor.class);
@@ -190,6 +195,7 @@ public class Goo extends Mob {
 					((GooSprite)sprite).triggerEmitters();
 				}
 				attack( enemy );
+				Invisibility.dispel(this);
 				spend( attackDelay() );
 			}
 
@@ -197,9 +203,13 @@ public class Goo extends Mob {
 
 		} else {
 
-			pumpedUp++;
 			if (Dungeon.isChallenged(Challenges.STRONGER_BOSSES)){
+				pumpedUp += 2;
+				//don't want to overly punish players with slow move or attack speed
+				spend(GameMath.gate(attackDelay(), Dungeon.hero.cooldown(), 3*attackDelay()));
+			} else {
 				pumpedUp++;
+				spend( attackDelay() );
 			}
 
 			((GooSprite)sprite).pumpUp( pumpedUp );
@@ -208,8 +218,6 @@ public class Goo extends Mob {
 				sprite.showStatus( CharSprite.NEGATIVE, Messages.get(this, "!!!") );
 				GLog.n( Messages.get(this, "pumpup") );
 			}
-
-			spend( attackDelay() );
 
 			return true;
 		}
@@ -235,6 +243,15 @@ public class Goo extends Mob {
 			sprite.idle();
 		}
 		return super.getCloser( target );
+	}
+
+	@Override
+	protected boolean getFurther(int target) {
+		if (pumpedUp != 0) {
+			pumpedUp = 0;
+			sprite.idle();
+		}
+		return super.getFurther( target );
 	}
 
 	@Override
@@ -279,8 +296,7 @@ public class Goo extends Mob {
 		if (Statistics.qualifiedForBossChallengeBadge){
 			Badges.validateBossChallengeCompleted();
 		}
-		Statistics.bossScores[0] += 1050; //Goo has a 50 point gimme
-		Statistics.bossScores[0] = Math.min(1000, Statistics.bossScores[0]);
+		Statistics.bossScores[0] += 1000;
 		
 		yell( Messages.get(this, "defeated") );
 	}

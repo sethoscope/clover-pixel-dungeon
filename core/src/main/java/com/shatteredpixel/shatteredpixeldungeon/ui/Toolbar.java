@@ -26,8 +26,11 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.QuickSlot;
 import com.shatteredpixel.shatteredpixeldungeon.SPDAction;
 import com.shatteredpixel.shatteredpixeldungeon.SPDSettings;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.HoldFast;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.LostInventory;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Belongings;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.Bag;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -145,7 +148,7 @@ public class Toolbar extends Component {
 						info += KeyBindings.getKeyName(KeyBindings.getFirstKeyForAction(GameAction.BACK, false)) + ": " + Messages.get(Toolbar.class, "quickslot_cancel");
 					}
 
-					GameScene.show(new RadialMenu(Messages.get(Toolbar.class, "quickslot_prompt"), info, slotNames, slotIcons) {
+					Game.scene().addToFront(new RadialMenu(Messages.get(Toolbar.class, "quickslot_prompt"), info, slotNames, slotIcons) {
 						@Override
 						public void onSelect(int idx, boolean alt) {
 							Item item = Dungeon.quickslot.getItem(idx);
@@ -249,8 +252,13 @@ public class Toolbar extends Component {
 			@Override
 			protected void onClick() {
 				if (Dungeon.hero.ready && !GameScene.cancel()) {
-					if (Dungeon.level.heaps.get(Dungeon.hero.pos) != null
+					Dungeon.hero.waitOrPickup = true;
+					if ((Dungeon.level.heaps.get(Dungeon.hero.pos) != null || Dungeon.hero.isStandingOnTrampleableGrass())
 						&& Dungeon.hero.handle(Dungeon.hero.pos)){
+						//trigger hold fast here, even if the hero didn't specifically wait
+						if (Dungeon.hero.hasTalent(Talent.HOLD_FAST)){
+							Buff.affect(Dungeon.hero, HoldFast.class);
+						}
 						Dungeon.hero.next();
 					} else {
 						examining = false;
@@ -389,7 +397,7 @@ public class Toolbar extends Component {
 						info += KeyBindings.getKeyName(KeyBindings.getFirstKeyForAction(GameAction.BACK, false)) + ": " + Messages.get(Toolbar.class, "container_cancel");
 					}
 
-					GameScene.show(new RadialMenu(Messages.get(Toolbar.class, "container_prompt"), info, names, images){
+					Game.scene().addToFront(new RadialMenu(Messages.get(Toolbar.class, "container_prompt"), info, names, images){
 						@Override
 						public void onSelect(int idx, boolean alt) {
 							super.onSelect(idx, alt);
@@ -426,23 +434,20 @@ public class Toolbar extends Component {
 							if (ControllerHandler.controllerActive){
 								info += KeyBindings.getKeyName(KeyBindings.getFirstKeyForAction(GameAction.LEFT_CLICK, true)) + ": " + Messages.get(Toolbar.class, "item_select") + "\n";
 								info += KeyBindings.getKeyName(KeyBindings.getFirstKeyForAction(GameAction.RIGHT_CLICK, true)) + ": " + Messages.get(Toolbar.class, "item_use") + "\n";
-								info += KeyBindings.getKeyName(KeyBindings.getFirstKeyForAction(GameAction.BACK, false)) + ": " + Messages.get(Toolbar.class, "item_cancel");
+								info += KeyBindings.getKeyName(KeyBindings.getFirstKeyForAction(GameAction.BACK, true)) + ": " + Messages.get(Toolbar.class, "item_cancel");
 							} else {
 								info += Messages.get(WndKeyBindings.class, SPDAction.LEFT_CLICK.name()) + ": " + Messages.get(Toolbar.class, "item_select") + "\n";
 								info += Messages.get(WndKeyBindings.class, SPDAction.RIGHT_CLICK.name()) + ": " + Messages.get(Toolbar.class, "item_use") + "\n";
 								info += KeyBindings.getKeyName(KeyBindings.getFirstKeyForAction(GameAction.BACK, false)) + ": " + Messages.get(Toolbar.class, "item_cancel");
 							}
 
-							GameScene.show(new RadialMenu(Messages.get(Toolbar.class, "item_prompt"), info, itemNames, itemIcons){
+							Game.scene().addToFront(new RadialMenu(Messages.get(Toolbar.class, "item_prompt"), info, itemNames, itemIcons){
 								@Override
 								public void onSelect(int idx, boolean alt) {
 									super.onSelect(idx, alt);
 									Item item = items.get(idx);
 									if (alt && item.defaultAction != null) {
 										item.execute(Dungeon.hero);
-										if (item.usesTargeting) {
-											QuickSlotButton.useTargeting(idx);
-										}
 									} else {
 										Game.scene().addToFront(new WndUseItem(null, item));
 									}
@@ -637,7 +642,17 @@ public class Toolbar extends Component {
 			btnInventory.enable(true);
 		}
 	}
-	
+
+	public void alpha( float value ){
+		btnWait.alpha( value );
+		btnSearch.alpha( value );
+		btnInventory.alpha( value );
+		for (QuickslotTool tool : btnQuick){
+			tool.alpha(value);
+		}
+		btnSwap.alpha( value );
+	}
+
 	public void pickup( Item item, int cell ) {
 		pickedUp.reset( item,
 			cell,
@@ -694,7 +709,11 @@ public class Toolbar extends Component {
 			base.x = x;
 			base.y = y;
 		}
-		
+
+		public void alpha( float value ){
+			base.alpha(value);
+		}
+
 		@Override
 		protected void onPointerDown() {
 			base.brightness( 1.4f );
@@ -746,7 +765,13 @@ public class Toolbar extends Component {
 			slot.setRect( x, y, width, height );
 			slot.slotMargins(borderLeft, 2, borderRight, 2);
 		}
-		
+
+		@Override
+		public void alpha(float value) {
+			super.alpha(value);
+			slot.alpha(value);
+		}
+
 		@Override
 		public void enable( boolean value ) {
 			super.enable( value && visible );
@@ -846,6 +871,14 @@ public class Toolbar extends Component {
 		protected void layout() {
 			super.layout();
 			updateVisuals();
+		}
+
+		@Override
+		public void alpha(float value) {
+			super.alpha(value);
+			for (Image im : icons){
+				if (im != null) im.alpha(value);
+			}
 		}
 
 		@Override
