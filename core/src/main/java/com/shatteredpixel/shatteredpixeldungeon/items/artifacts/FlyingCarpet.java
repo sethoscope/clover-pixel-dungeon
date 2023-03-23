@@ -61,15 +61,19 @@ public class FlyingCarpet extends Artifact {
 	}
 
 	public static final String AC_FLY = "FLY";
+	public static final String AC_STOP = "STOP";
 
 	@Override
 	public ArrayList<String> actions( Hero hero ) {
 		ArrayList<String> actions = super.actions( hero );
 		if (isEquipped( hero )
 				&& !cursed
-				&& hero.buff(MagicImmune.class) == null
-				&& (charge > 0 || activeBuff != null)) {
-			actions.add(AC_FLY);
+				&& hero.buff(MagicImmune.class) == null) {
+			if ( activeBuff != null ) {
+				actions.add(AC_STOP);
+			} else if (charge > 0) {
+				actions.add(AC_FLY);
+			}
 		}
 		return actions;
 	}
@@ -81,27 +85,25 @@ public class FlyingCarpet extends Artifact {
 
 		if (hero.buff(MagicImmune.class) != null) return;
 
-		if (action.equals(AC_FLY)) {
-
-			if (activeBuff == null){
-				if (!isEquipped(hero)) GLog.i( Messages.get(Artifact.class, "need_to_equip") );
-				else if (cursed)       GLog.i( Messages.get(this, "cursed") );
-				else if (charge <= 0)  GLog.i( Messages.get(this, "no_charge") );
-				else {
-					hero.spend( 1f );
-					hero.busy();
-					Sample.INSTANCE.play(Assets.Sounds.MELD);
-					activeBuff = activeBuff();
-					activeBuff.attachTo(hero);
-					Talent.onArtifactUsed(Dungeon.hero);
-					hero.sprite.operate(hero.pos);
-				}
-			} else {
-				activeBuff.detach();
-				activeBuff = null;
-				hero.sprite.operate( hero.pos );
+		if (action.equals(AC_FLY) && (activeBuff == null)) {
+			if (!isEquipped(hero)) GLog.i(Messages.get(Artifact.class, "need_to_equip"));
+			else if (cursed) GLog.i(Messages.get(this, "cursed"));
+			else if (charge <= 0) GLog.i(Messages.get(this, "no_charge"));
+			else {
+				hero.spend(1f);
+				hero.busy();
+				Sample.INSTANCE.play(Assets.Sounds.MELD);
+				activeBuff = activeBuff();
+				activeBuff.attachTo(hero);
+				Talent.onArtifactUsed(Dungeon.hero);
+				hero.sprite.operate(hero.pos);
+				defaultAction = AC_STOP;
 			}
-
+		} else if (action.equals(AC_STOP) && (activeBuff != null)) {
+			activeBuff.detach();
+			activeBuff = null;
+			hero.sprite.operate( hero.pos );
+			defaultAction = AC_FLY;
 		}
 	}
 
