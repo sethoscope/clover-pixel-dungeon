@@ -58,9 +58,6 @@ public class FlyingCarpet extends Artifact {
 		chargeCap = Math.min(level()+3, 10);
 
 		defaultAction = AC_FLY;
-
-		unique = true;
-		bones = true;
 	}
 
 	public static final String AC_FLY = "FLY";
@@ -196,11 +193,6 @@ public class FlyingCarpet extends Artifact {
 			activeBuff = new carpetFlying();
 			activeBuff.restoreFromBundle(bundle.getBundle(BUFF));
 		}
-	}
-
-	@Override
-	public int value() {
-		return 0;
 	}
 
 	public class carpetRecharge extends ArtifactBuff{
