@@ -57,7 +57,7 @@ public class FlyingCarpet extends Artifact {
 		partialCharge = 0;
 		chargeCap = Math.min(level()+3, 10);
 
-		defaultAction = AC_FLY;
+		defaultAction = AC_FLY;  // really it just toggles
 	}
 
 	public static final String AC_FLY = "FLY";
@@ -85,7 +85,7 @@ public class FlyingCarpet extends Artifact {
 
 		if (hero.buff(MagicImmune.class) != null) return;
 
-		if (action.equals(AC_FLY) && (activeBuff == null)) {
+		if ((action.equals(AC_FLY) || action.equals(AC_STOP)) && (activeBuff == null)) {
 			if (!isEquipped(hero)) GLog.i(Messages.get(Artifact.class, "need_to_equip"));
 			else if (cursed) GLog.i(Messages.get(this, "cursed"));
 			else if (charge <= 0) GLog.i(Messages.get(this, "no_charge"));
@@ -97,13 +97,11 @@ public class FlyingCarpet extends Artifact {
 				activeBuff.attachTo(hero);
 				Talent.onArtifactUsed(Dungeon.hero);
 				hero.sprite.operate(hero.pos);
-				defaultAction = AC_STOP;
 			}
-		} else if (action.equals(AC_STOP) && (activeBuff != null)) {
+		} else if ((action.equals(AC_STOP) || action.equals(AC_FLY)) && (activeBuff != null)) {
 			activeBuff.detach();
 			activeBuff = null;
 			hero.sprite.operate( hero.pos );
-			defaultAction = AC_FLY;
 		}
 	}
 
@@ -328,7 +326,6 @@ public class FlyingCarpet extends Artifact {
 		@Override
 		public void detach() {
 			activeBuff = null;
-
 			target.flying = false;
 			if (ShatteredPixelDungeon.scene() instanceof GameScene) {
 				Dungeon.level.occupyCell(target);
