@@ -8,8 +8,6 @@ This fork adds:
 - a **flying carpet** artifact
 
 
-
-
 If you'd like to work with the code, you can find the following guides in `/docs`:
 
 - [Compiling for Android.](docs/getting-started-android.md)
