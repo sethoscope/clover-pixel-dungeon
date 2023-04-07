@@ -26,6 +26,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Levitation;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.LockedFloor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.MagicImmune;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Roots;
@@ -326,12 +327,12 @@ public class FlyingCarpet extends Artifact {
 		@Override
 		public void detach() {
 			activeBuff = null;
-			target.flying = false;
-			if (ShatteredPixelDungeon.scene() instanceof GameScene) {
-				Dungeon.level.occupyCell(target);
-			}
+			if (target.buff(Levitation.class) == null) target.flying = false;
 			updateQuickslot();
 			super.detach();
+			if (!target.flying && ShatteredPixelDungeon.scene() instanceof GameScene) {
+				Dungeon.level.occupyCell(target);
+			}
 		}
 		
 		private static final String TURNSTOCOST = "turnsToCost";
