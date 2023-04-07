@@ -361,8 +361,10 @@ public class CharSprite extends MovieClip implements Tweener.Listener, MovieClip
 				}
 				break;
 			case LEVITATING:
-				levitation = emitter();
-				levitation.pour( Speck.factory( Speck.JET ), 0.02f );
+				if ( levitation == null ) {
+					levitation = emitter();
+					levitation.pour(Speck.factory(Speck.JET), 0.02f);
+				}
 				break;
 			case INVISIBLE:
 				if (invisible != null) {

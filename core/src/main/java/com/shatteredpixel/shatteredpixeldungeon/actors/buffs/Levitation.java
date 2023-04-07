@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.FlyingCarpet;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.TimekeepersHourglass;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.plants.Swiftthistle;
@@ -53,11 +54,11 @@ public class Levitation extends FlavourBuff {
 	
 	@Override
 	public void detach() {
-		target.flying = false;
+		if (target.buff(FlyingCarpet.carpetFlying.class) == null) target.flying = false;
 		super.detach();
 		//only press tiles if we're current in the game screen
-		if (ShatteredPixelDungeon.scene() instanceof GameScene) {
-			Dungeon.level.occupyCell(target );
+		if (!target.flying && ShatteredPixelDungeon.scene() instanceof GameScene) {
+			Dungeon.level.occupyCell(target);
 		}
 	}
 
@@ -92,6 +93,6 @@ public class Levitation extends FlavourBuff {
 	@Override
 	public void fx(boolean on) {
 		if (on) target.sprite.add(CharSprite.State.LEVITATING);
-		else target.sprite.remove(CharSprite.State.LEVITATING);
+		else if (!target.flying) target.sprite.remove( CharSprite.State.LEVITATING );
 	}
 }
