@@ -88,7 +88,7 @@ public abstract class ExoticScroll extends Scroll {
 	public boolean isKnown() {
 		return anonymous || (handler != null && handler.isKnown( exoToReg.get(this.getClass()) ));
 	}
-	
+
 	@Override
 	public void setKnown() {
 		if (!isKnown()) {
@@ -96,7 +96,15 @@ public abstract class ExoticScroll extends Scroll {
 			updateQuickslot();
 		}
 	}
-	
+
+	@Override
+	public void setUnknown() {
+		if (isKnown()) {
+			handler.unknow(exoToReg.get(this.getClass()));
+			updateQuickslot();
+		}
+	}
+
 	@Override
 	public void reset() {
 		super.reset();

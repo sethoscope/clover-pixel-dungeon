@@ -196,15 +196,23 @@ public class ItemStatusHandler<T extends Item> {
 	public boolean isKnown( Class<?extends T> itemCls ){
 		return known.contains( itemCls );
 	}
-	
+
 	public void know( T item ) {
 		known.add( (Class<? extends T>)item.getClass() );
 	}
-	
+
 	public void know( Class<?extends T> itemCls ){
 		known.add( itemCls );
 	}
-	
+
+	public void unknow( T item ) {
+		if (isKnown(item)) known.remove( (Class<? extends T>)item.getClass() );
+	}
+
+	public void unknow( Class<?extends T> itemCls ){
+		if (isKnown(itemCls)) known.remove( itemCls );
+	}
+
 	public HashSet<Class<? extends T>> known() {
 		return known;
 	}

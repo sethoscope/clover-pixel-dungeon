@@ -440,10 +440,25 @@ public class Item implements Bundlable {
 		levelKnown = true;
 		cursedKnown = true;
 		Item.updateQuickslot();
-		
+
 		return this;
 	}
-	
+
+	public final Item unidentify(){
+		return unidentify(true);
+	}
+
+	public Item unidentify( boolean byHero ) {
+		if (byHero && Dungeon.hero != null && Dungeon.hero.isAlive()){
+			Catalog.setUnseen(getClass());
+		}
+
+		levelKnown = false;
+		cursedKnown = false;
+		Item.updateQuickslot();
+		return this;
+	}
+
 	public void onHeroGainExp( float levelPercent, Hero hero ){
 		//do nothing by default
 	}

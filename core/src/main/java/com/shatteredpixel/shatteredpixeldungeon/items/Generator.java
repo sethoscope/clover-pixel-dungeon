@@ -78,6 +78,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfSharpshooting;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfTenacity;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfWealth;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.Scroll;
+import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfForgetting;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfIdentify;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfLullaby;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMagicMapping;
@@ -294,6 +295,7 @@ public class Generator {
 			SCROLL.classes = new Class<?>[]{
 					ScrollOfUpgrade.class, //3 drop every chapter, see Dungeon.souNeeded()
 					ScrollOfIdentify.class,
+					ScrollOfForgetting.class,
 					ScrollOfRemoveCurse.class,
 					ScrollOfMirrorImage.class,
 					ScrollOfRecharging.class,
@@ -305,7 +307,7 @@ public class Generator {
 					ScrollOfTerror.class,
 					ScrollOfTransmutation.class
 			};
-			SCROLL.defaultProbs = new float[]{ 0, 6, 4, 3, 3, 3, 2, 2, 2, 2, 2, 1 };
+			SCROLL.defaultProbs = new float[]{ 0, 6, 5, 4, 3, 3, 3, 2, 2, 2, 2, 2, 1 };
 			SCROLL.probs = SCROLL.defaultProbs.clone();
 			
 			STONE.classes = new Class<?>[]{
