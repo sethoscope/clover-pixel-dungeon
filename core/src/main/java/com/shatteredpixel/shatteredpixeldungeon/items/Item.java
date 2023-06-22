@@ -459,6 +459,8 @@ public class Item implements Bundlable {
 		return this;
 	}
 
+	public void setUnknown() {}
+
 	public void onHeroGainExp( float levelPercent, Hero hero ){
 		//do nothing by default
 	}

@@ -21,15 +21,19 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items.scrolls;
 
-import com.shatteredpixel.shatteredpixeldungeon.Badges;
-import com.shatteredpixel.shatteredpixeldungeon.effects.Identification;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
-import com.shatteredpixel.shatteredpixeldungeon.journal.Catalog;
+import com.shatteredpixel.shatteredpixeldungeon.items.potions.Potion;
+import com.shatteredpixel.shatteredpixeldungeon.items.rings.Ring;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
+import com.watabou.utils.Random;
+import com.watabou.utils.Reflection;
 
-public class ScrollOfForgetting extends InventoryScroll {
+import java.util.ArrayList;
+
+public class ScrollOfForgetting extends Scroll {
 
 	{
 		icon = ItemSpriteSheet.Icons.SCROLL_IDENTIFY;
@@ -37,18 +41,29 @@ public class ScrollOfForgetting extends InventoryScroll {
 		bones = true;
 	}
 
-	@Override
-	protected boolean usableOnItem(Item item) {
-		return item.isIdentified();
+	private ArrayList<Class<? extends Item>> forgettableClasses() {
+		ArrayList<Class<? extends Item>> known = new ArrayList<>();
+		known.addAll(Ring.getKnown());
+		known.addAll(Scroll.getKnown());
+		known.addAll(Potion.getKnown());
+		return known;
+	}
+	protected void forgetSomething( Hero hero ) {
+		ArrayList<Class<? extends Item>> classes = forgettableClasses();
+		if ( classes.size() == 0 ) {
+			return; // nothing left to forget!
+		}
+		Class<? extends Item> cls = Random.element(classes);
+		Item it = (Item) Reflection.newInstance(cls);
+		it.setUnknown();
+		GLog.i(Messages.get(this, "msg", it.name()));
 	}
 
 	@Override
-	protected void onItemSelected( Item item ) {
-		curUser.sprite.parent.add( new Identification( curUser.sprite.center().offset( 0, -16 ) ) );
-		item.unidentify();
-		GLog.i( Messages.get(this, "it_is", item.title()) );
+	public void doRead() {
+		forgetSomething( curUser );
 	}
-	
+
 	@Override
 	public int value() {
 		return isKnown() ? 30 * quantity : super.value();
