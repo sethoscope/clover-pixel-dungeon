@@ -21,47 +21,23 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.items.scrolls;
 
-import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
-import com.shatteredpixel.shatteredpixeldungeon.items.Item;
-import com.shatteredpixel.shatteredpixeldungeon.items.potions.Potion;
-import com.shatteredpixel.shatteredpixeldungeon.items.rings.Ring;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Forgetfulness;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
-import com.watabou.utils.Random;
-import com.watabou.utils.Reflection;
-
-import java.util.ArrayList;
 
 public class ScrollOfForgetting extends Scroll {
 
 	{
 		icon = ItemSpriteSheet.Icons.SCROLL_IDENTIFY;
-
 		bones = true;
 	}
-
-	private ArrayList<Class<? extends Item>> forgettableClasses() {
-		ArrayList<Class<? extends Item>> known = new ArrayList<>();
-		known.addAll(Ring.getKnown());
-		known.addAll(Scroll.getKnown());
-		known.addAll(Potion.getKnown());
-		return known;
-	}
-	protected void forgetSomething( Hero hero ) {
-		ArrayList<Class<? extends Item>> classes = forgettableClasses();
-		if ( classes.size() == 0 ) {
-			return; // nothing left to forget!
-		}
-		Class<? extends Item> cls = Random.element(classes);
-		Item it = (Item) Reflection.newInstance(cls);
-		it.setUnknown();
-		GLog.i(Messages.get(this, "msg", it.name()));
-	}
-
-	@Override
 	public void doRead() {
-		forgetSomething( curUser );
+		Buff.affect( curUser, Forgetfulness.class );
+		GLog.i(Messages.get(this, "read"));
+		identify();
+		readAnimation();
 	}
 
 	@Override
