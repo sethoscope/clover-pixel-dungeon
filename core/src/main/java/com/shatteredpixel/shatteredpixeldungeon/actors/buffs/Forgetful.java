@@ -1,31 +1,32 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
-import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.Potion;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.Ring;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.Scroll;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
-import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.utils.Random;
 import com.watabou.utils.Reflection;
 
 import java.util.ArrayList;
 
-public class Forgetfulness extends Buff {
+public class Forgetful extends Buff {
+    private boolean first = true;
+
     {
         revivePersists = true;
-        announced = true;
     }
 
     public boolean act() {
-        forgetSomething();
-        // forget something every so often
-        spend(Random.NormalFloat( 10.0F, 300.0F));
-        // It might be fun to have it start as very low probability and increase a tiny amount
-        // every turn based on health and hunger levels until something is forgotten and
-        // the likelihood resets.
+        if ( first ) {
+            first = false;
+        } else {
+            forgetSomething();
+        }
+        // The deeper you go, the faster you forget.
+        spend(Random.NormalFloat( 10.0F, 300.0F - 10* Statistics.deepestFloor));
         return true;
     }
 
@@ -46,10 +47,5 @@ public class Forgetfulness extends Buff {
         it.setUnknown();
         Item.updateQuickslot();
         GLog.i(Messages.get(this, "msg", it.name()));
-    }
-
-    @Override
-    public int icon() {
-        return BuffIndicator.ANTIMAGIC;
     }
 }
