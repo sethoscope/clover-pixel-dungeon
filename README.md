@@ -4,8 +4,9 @@ Clover Pixel Dungeon is a fork of [Shattered Pixel Dungeon](https://shatteredpix
 
 This fork adds:
 
-- a **wand of anti-magic**, which temporarily suppresses a target's magical abilities
-- a **flying carpet** artifact
+- a **wand of anti-magic**, which temporarily suppresses a target's magical abilities,
+- a **flying carpet** artifact, and
+- a **Forgetful** challenge, which makes some identifications temporary.
 
 
 If you'd like to work with the code, you can find the following guides in `/docs`:

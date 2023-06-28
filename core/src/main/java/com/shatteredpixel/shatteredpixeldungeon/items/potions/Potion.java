@@ -319,20 +319,33 @@ public class Potion extends Item {
 	public boolean isKnown() {
 		return anonymous || (handler != null && handler.isKnown( this ));
 	}
-	
+
 	public void setKnown() {
 		if (!anonymous) {
 			if (!isKnown()) {
 				handler.know(this);
 				updateQuickslot();
 			}
-			
+
 			if (Dungeon.hero.isAlive()) {
 				Catalog.setSeen(getClass());
 			}
 		}
 	}
-	
+
+	public void setUnknown() {
+		if (!anonymous) {
+			if (isKnown()) {
+				handler.unknow(this);
+				updateQuickslot();
+			}
+
+			if (Dungeon.hero.isAlive()) {
+				Catalog.setUnseen(getClass());
+			}
+		}
+	}
+
 	@Override
 	public Item identify( boolean byHero ) {
 		super.identify(byHero);
@@ -342,7 +355,17 @@ public class Potion extends Item {
 		}
 		return this;
 	}
-	
+
+	@Override
+	public Item unidentify( boolean byHero ) {
+		super.unidentify(byHero);
+
+		if (isKnown()) {
+			setUnknown();
+		}
+		return this;
+	}
+
 	@Override
 	public String name() {
 		return isKnown() ? super.name() : Messages.get(this, color);

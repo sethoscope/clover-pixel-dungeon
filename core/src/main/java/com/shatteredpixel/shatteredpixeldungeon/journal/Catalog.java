@@ -119,7 +119,7 @@ public enum Catalog {
 		}
 		return false;
 	}
-	
+
 	public static void setSeen(Class<? extends Item> itemClass){
 		for (Catalog cat : values()) {
 			if (cat.seen.containsKey(itemClass) && !cat.seen.get(itemClass)) {
@@ -129,7 +129,16 @@ public enum Catalog {
 		}
 		Badges.validateItemsIdentified();
 	}
-	
+
+	public static void setUnseen(Class<? extends Item> itemClass){
+		for (Catalog cat : values()) {
+			if (cat.seen.containsKey(itemClass) && cat.seen.get(itemClass)) {
+				cat.seen.replace(itemClass, true, false);
+				Journal.saveNeeded = true;
+			}
+		}
+	}
+
 	private static final String CATALOG_ITEMS = "catalog_items";
 	
 	public static void store( Bundle bundle ){
