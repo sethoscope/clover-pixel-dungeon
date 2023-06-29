@@ -161,10 +161,7 @@ public class Ring extends KindofMisc {
 		if (!anonymous) {
 			if (isKnown()) {
 				handler.unknow(this);
-			}
-
-			if (Dungeon.hero.isAlive()) {
-				Catalog.setUnseen(getClass());
+				updateQuickslot();
 			}
 		}
 	}

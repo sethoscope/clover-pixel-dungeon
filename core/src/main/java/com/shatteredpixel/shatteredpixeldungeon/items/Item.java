@@ -449,10 +449,6 @@ public class Item implements Bundlable {
 	}
 
 	public Item unidentify( boolean byHero ) {
-		if (byHero && Dungeon.hero != null && Dungeon.hero.isAlive()){
-			Catalog.setUnseen(getClass());
-		}
-
 		levelKnown = false;
 		cursedKnown = false;
 		Item.updateQuickslot();

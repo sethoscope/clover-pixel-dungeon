@@ -217,10 +217,6 @@ public abstract class Scroll extends Item {
 				handler.unknow(this);
 				updateQuickslot();
 			}
-
-			if (Dungeon.hero.isAlive()) {
-				Catalog.setUnseen(getClass());
-			}
 		}
 	}
 
