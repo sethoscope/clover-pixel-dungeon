@@ -170,6 +170,15 @@ public class Mimic extends Mob {
 	}
 
 	@Override
+	public int defenseProc(Char enemy, int damage) {
+		if (state == PASSIVE){
+			alignment = Alignment.ENEMY;
+			stopHiding();
+		}
+		return super.defenseProc(enemy, damage);
+	}
+
+	@Override
 	public void damage(int dmg, Object src) {
 		if (state == PASSIVE){
 			alignment = Alignment.ENEMY;
@@ -294,16 +303,16 @@ public class Mimic extends Mob {
 					reward = new Gold().random();
 					break;
 				case 1:
-					reward = Generator.randomMissile();
+					reward = Generator.randomMissile(true);
 					break;
 				case 2:
 					reward = Generator.randomArmor();
 					break;
 				case 3:
-					reward = Generator.randomWeapon();
+					reward = Generator.randomWeapon(true);
 					break;
 				case 4:
-					reward = Generator.random(Generator.Category.RING);
+					reward = Generator.randomUsingDefaults(Generator.Category.RING);
 					break;
 			}
 		} while (reward == null || Challenges.isItemBlocked(reward));
