@@ -26,7 +26,7 @@ public class Forgetful extends Buff {
             forgetSomething();
         }
         // The deeper you go, the faster you forget.
-        spend(Random.NormalFloat( 10.0F, 300.0F - 10* Statistics.deepestFloor));
+        spend(Random.NormalFloat( 20.0F, 400.0F - 10* Statistics.deepestFloor));
         return true;
     }
 
