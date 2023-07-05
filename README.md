@@ -6,7 +6,7 @@ This fork adds:
 
 - a **wand of anti-magic**, which temporarily suppresses a target's magical abilities,
 - a **flying carpet** artifact, and
-- a **Forgetful** challenge, which makes some identifications temporary.
+- a **Forgetful** challenge, which makes identification of potions and scrolls temporary.
 
 
 If you'd like to work with the code, you can find the following guides in `/docs`:

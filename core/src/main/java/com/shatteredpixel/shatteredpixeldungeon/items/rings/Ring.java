@@ -156,15 +156,6 @@ public class Ring extends KindofMisc {
 		}
 	}
 
-	public void setUnknown() {
-		if (!anonymous) {
-			if (isKnown()) {
-				handler.unknow(this);
-				updateQuickslot();
-			}
-		}
-	}
-
 	@Override
 	public String name() {
 		return isKnown() ? super.name() : Messages.get(Ring.class, gem);

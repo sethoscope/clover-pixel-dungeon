@@ -3,7 +3,6 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.Potion;
-import com.shatteredpixel.shatteredpixeldungeon.items.rings.Ring;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.Scroll;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
@@ -32,7 +31,6 @@ public class Forgetful extends Buff {
 
     private ArrayList<Class<? extends Item>> forgettableClasses() {
         ArrayList<Class<? extends Item>> known = new ArrayList<>();
-        known.addAll(Ring.getKnown());
         known.addAll(Scroll.getKnown());
         known.addAll(Potion.getKnown());
         return known;
@@ -44,6 +42,7 @@ public class Forgetful extends Buff {
         }
         Class<? extends Item> cls = Random.element(classes);
         Item it = (Item) Reflection.newInstance(cls);
+        assert it != null;
         it.setUnknown();
         Item.updateQuickslot();
         GLog.i(Messages.get(this, "msg", it.name()));
