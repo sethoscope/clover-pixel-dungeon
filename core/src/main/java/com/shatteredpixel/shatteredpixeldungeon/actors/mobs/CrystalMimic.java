@@ -26,6 +26,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AllyBuff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AntiMagic;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Dread;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Haste;
@@ -136,7 +137,7 @@ public class CrystalMimic extends Mimic {
 				}
 			}
 
-			if (!candidates.isEmpty()){
+			if (!candidates.isEmpty() && buff( AntiMagic.class ) == null){
 				ScrollOfTeleportation.appear(enemy, Random.element(candidates));
 			}
 
