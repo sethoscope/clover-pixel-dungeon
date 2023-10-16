@@ -26,6 +26,8 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Haste;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Levitation;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.LockedFloor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.MagicImmune;
@@ -43,6 +45,7 @@ import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.Image;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Bundle;
+import com.watabou.utils.Random;
 
 import java.util.ArrayList;
 
@@ -199,7 +202,16 @@ public class FlyingCarpet extends Artifact {
 	public class carpetRecharge extends ArtifactBuff{
 		@Override
 		public boolean act() {
-			if (charge < chargeCap && !cursed && target.buff(MagicImmune.class) == null) {
+			if (cursed) {
+				if ((Random.Int(8) == 0) && (target.buff(Levitation.class) != null)) {
+					GLog.i( Messages.get(FlyingCarpet.class, "no_levitate") );
+					Buff.detach(target, Levitation.class);
+				}
+				if ((Random.Int(6) == 0) && (target.buff(Haste.class) != null)) {
+					GLog.i( Messages.get(FlyingCarpet.class, "no_haste") );
+					Buff.detach(target, Haste.class);
+				}
+			} else if (charge < chargeCap && !cursed && target.buff(MagicImmune.class) == null) {
 				LockedFloor lock = target.buff(LockedFloor.class);
 				if (activeBuff == null && (lock == null || lock.regenOn())) {
 					float missing = (chargeCap - charge);
