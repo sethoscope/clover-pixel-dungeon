@@ -539,6 +539,21 @@ public class Generator {
 	public static void reset(Category cat){
 		if (cat.defaultProbs != null) cat.probs = cat.defaultProbs.clone();
 	}
+
+	//reverts changes to drop chances generates by this item
+	//equivalent of shuffling the card back into the deck, does not preserve order!
+	public static void undoDrop(Item item){
+		for (Category cat : Category.values()){
+			if (item.getClass().isAssignableFrom(cat.superClass)){
+				if (cat.defaultProbs == null) continue;
+				for (int i = 0; i < cat.classes.length; i++){
+					if (item.getClass() == cat.classes[i]){
+						cat.probs[i]++;
+					}
+				}
+			}
+		}
+	}
 	
 	public static Item random() {
 		Category cat = Random.chances( categoryProbs );
@@ -645,7 +660,7 @@ public class Generator {
 	}
 
 	public static MeleeWeapon randomWeapon(boolean useDefaults) {
-		return randomWeapon(Dungeon.depth / 5, false);
+		return randomWeapon(Dungeon.depth / 5, useDefaults);
 	}
 	
 	public static MeleeWeapon randomWeapon(int floorSet, boolean useDefaults) {

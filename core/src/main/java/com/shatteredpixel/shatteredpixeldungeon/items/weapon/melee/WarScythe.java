@@ -44,8 +44,9 @@ public class WarScythe extends MeleeWeapon {
 				lvl*(tier+1);                   //scaling unchanged
 	}
 
-	public float abilityChargeUse(Hero hero, Char target) {
-		return 2*super.abilityChargeUse(hero, target);
+	@Override
+	protected int baseChargeUse(Hero hero, Char target){
+		return 2;
 	}
 
 	@Override
@@ -55,7 +56,7 @@ public class WarScythe extends MeleeWeapon {
 
 	@Override
 	protected void duelistAbility(Hero hero, Integer target) {
-		Sickle.harvestAbility(hero, target, 0.8f, this);
+		Sickle.harvestAbility(hero, target, 0.9f, this);
 	}
 
 }
