@@ -364,4 +364,14 @@ public class FlyingCarpet extends Artifact {
 			turnsToCost = bundle.getInt( TURNSTOCOST );
 		}
 	}
+	@Override
+	public String desc() {
+		String desc = super.desc();
+		if ( isEquipped( Dungeon.hero ) ){
+			if (cursed) {
+				desc += "\n\n" +Messages.get(this, "desc_cursed");
+			}
+		}
+		return desc;
+	}
 }
