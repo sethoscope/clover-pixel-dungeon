@@ -62,6 +62,22 @@ public class AboutScene extends PixelScene {
 		Component content = list.content();
 		content.clear();
 
+                //*** Clover Pixel Dungeon Credits ***
+
+		final int CLOVER_COLOR = 0x5073FF;
+		CreditsBlock cpx = new CreditsBlock(true, CLOVER_COLOR,
+				"Clover Pixel Dungeon",
+                                null,
+				"By: _Seth & Arcadia Golub_\nBased on Shattered Pixel Dungeon",
+                                "github.com/sethoscope",
+				"https://github.com/sethoscope/clover-pixel-dungeon");
+		if (landscape()){
+			cpx.setRect((w - fullWidth)/2f - 6, 10, fullWidth, 0);
+		} else {
+			cpx.setRect((w - fullWidth)/2f, 6, fullWidth, 0);
+		}
+		content.add(cpx);
+
 		//*** Shattered Pixel Dungeon Credits ***
 
 		String shpxLink = "https://ShatteredPixel.com";
@@ -77,11 +93,13 @@ public class AboutScene extends PixelScene {
 				"ShatteredPixel.com",
 				shpxLink);
 		if (landscape()){
-			shpx.setRect((w - fullWidth)/2f - 6, 10, 120, 0);
+ 			shpx.setRect((w - fullWidth)/2f - 6, cpx.bottom() + 8, colWidth, 0);
 		} else {
-			shpx.setRect((w - fullWidth)/2f, 6, 120, 0);
+ 			shpx.setRect((w - fullWidth)/2f - 6, cpx.bottom() + 8, colWidth, 0);
 		}
 		content.add(shpx);
+
+		addLine(shpx.top() - 4, content);
 
 		CreditsBlock alex = new CreditsBlock(false, Window.SHPX_COLOR,
 				"Hero Art & Design:",
