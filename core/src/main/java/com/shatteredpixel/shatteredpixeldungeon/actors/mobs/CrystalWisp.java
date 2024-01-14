@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.mobs;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AntiMagic;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
 import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
@@ -91,7 +92,8 @@ public class CrystalWisp extends Mob{
 	@Override
 	protected boolean canAttack( Char enemy ) {
 		return super.canAttack(enemy)
-				|| new Ballistica( pos, enemy.pos, Ballistica.MAGIC_BOLT).collisionPos == enemy.pos;
+				|| (buff( AntiMagic.class ) == null
+					&& new Ballistica( pos, enemy.pos, Ballistica.MAGIC_BOLT).collisionPos == enemy.pos);
 	}
 
 	protected boolean doAttack(Char enemy ) {
@@ -102,7 +104,6 @@ public class CrystalWisp extends Mob{
 			return super.doAttack( enemy );
 
 		} else {
-
 			if (sprite != null && (sprite.visible || enemy.sprite.visible)) {
 				sprite.zap( enemy.pos );
 				return false;
