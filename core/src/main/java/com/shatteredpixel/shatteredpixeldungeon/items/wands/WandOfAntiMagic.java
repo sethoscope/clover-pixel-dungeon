@@ -32,11 +32,14 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.effects.MagicMissile;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MagesStaff;
 import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
+import com.shatteredpixel.shatteredpixeldungeon.effects.Beam;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
+import com.shatteredpixel.shatteredpixeldungeon.tiles.DungeonTilemap;
 import com.watabou.utils.Callback;
+import com.watabou.utils.PointF;
 import com.watabou.utils.Random;
 
 import java.util.HashMap;
@@ -81,23 +84,20 @@ public class WandOfAntiMagic extends Wand {
 	}
 
 	@Override
-	public void fx(Ballistica bolt, Callback callback) {
-		MagicMissile.boltFromChar( curUser.sprite.parent,
-				MagicMissile.SHADOW,
-				curUser.sprite,
-				bolt.collisionPos,
-				callback);
-		Sample.INSTANCE.play( Assets.Sounds.ZAP );
+	public void fx(Ballistica beam, Callback callback) {
+		int cell = beam.path.get(beam.dist);
+		curUser.sprite.parent.add(new Beam.AntiMagicRay(curUser.sprite.center(), DungeonTilemap.raisedTileCenterToWorld( cell )));
+		callback.call();
 	}
 
 	@Override
 	public void staffFx(MagesStaff.StaffParticle particle) {
-		particle.color( 0 );
-		particle.am = 0.6f;
-		particle.setLifespan(2f);
-		particle.speed.set(0, 5);
-		particle.setSize( 0.5f, 2f);
-		particle.shuffleXY(1f);
+		particle.color( 0x880011 );
+		particle.am = 0.3f;
+		particle.setLifespan(3f);
+		particle.speed.polar(Random.Float(PointF.PI2), 0.75f);
+		particle.setSize( 1f, 1f);
+		particle.radiateXY(2.0f);
 	}
 
 }

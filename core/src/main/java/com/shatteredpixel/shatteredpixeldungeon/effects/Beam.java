@@ -71,7 +71,18 @@ public class Beam extends Image {
 			super(s, e, Effects.Type.HEALTH_RAY, 0.75f);
 		}
 	}
-	
+
+	public static class AntiMagicRay extends Beam {
+		public AntiMagicRay(PointF s, PointF e) {
+			super(s, e, Effects.Type.ANTIMAGIC_RAY, 0.75f);
+		}
+
+		@Override
+		public void draw() {
+			drawNormal();
+		}
+	}
+
 	@Override
 	public void update() {
 		super.update();
@@ -90,5 +101,9 @@ public class Beam extends Image {
 		Blending.setLightMode();
 		super.draw();
 		Blending.setNormalMode();
+	}
+
+	protected void drawNormal() {
+		super.draw();
 	}
 }
