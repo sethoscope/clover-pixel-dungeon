@@ -15,8 +15,8 @@ allprojects {
         appName = 'Clover Pixel Dungeon'
         appPackageName = 'org.fogplex.cloverpixeldungeon'
 
-        appVersionCode = 754
-        appVersionName = '2.2.1.1'
+        appVersionCode = 755
+        appVersionName = '2.2.1.2'
 
         appJavaCompatibility = JavaVersion.VERSION_1_8
 
