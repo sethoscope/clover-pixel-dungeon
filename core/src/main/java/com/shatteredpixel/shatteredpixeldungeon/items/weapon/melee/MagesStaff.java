@@ -38,6 +38,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.bags.Bag;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.MagicalHolster;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfRecharging;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.Wand;
+import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfAntiMagic;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfCorrosion;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfCorruption;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfDisintegration;
@@ -512,6 +513,7 @@ public class MagesStaff extends MeleeWeapon {
 			return !((wand instanceof WandOfDisintegration)
 					|| (wand instanceof WandOfCorruption)
 					|| (wand instanceof WandOfCorrosion)
+					|| (wand instanceof WandOfAntiMagic)
 					|| (wand instanceof WandOfRegrowth)
 					|| (wand instanceof WandOfLivingEarth));
 		}

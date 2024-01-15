@@ -39,6 +39,7 @@ import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
 import com.shatteredpixel.shatteredpixeldungeon.tiles.DungeonTilemap;
 import com.watabou.utils.Callback;
+import com.watabou.utils.ColorMath;
 import com.watabou.utils.PointF;
 import com.watabou.utils.Random;
 
@@ -60,7 +61,7 @@ public class WandOfAntiMagic extends Wand {
 			}
 
 			Mob enemy = (Mob) ch;
-                        debuffEnemy( enemy );
+			debuffEnemy( enemy );
 			wandProc(ch, chargesPerCast());
 			Sample.INSTANCE.play( Assets.Sounds.HIT_MAGIC, 1, 0.8f * Random.Float(0.87f, 1.15f) );
 			
@@ -79,7 +80,7 @@ public class WandOfAntiMagic extends Wand {
 		// lvl 1 - 40%
 		// lvl 2 - 50%
 		if (Random.Int( buffedLvl() + 4 ) >= 3){
-			Buff.prolong( defender, AntiMagic.class, buffedLvl()/2);
+			Buff.prolong( defender, AntiMagic.class, buffedLvl()/2.0f);
 		}
 	}
 
@@ -92,12 +93,32 @@ public class WandOfAntiMagic extends Wand {
 
 	@Override
 	public void staffFx(MagesStaff.StaffParticle particle) {
-		particle.color( 0x880011 );
-		particle.am = 0.3f;
-		particle.setLifespan(3f);
-		particle.speed.polar(Random.Float(PointF.PI2), 0.75f);
-		particle.setSize( 1f, 1f);
-		particle.radiateXY(2.0f);
+		if (Random.Int(4) == 0) {
+			particle.color(0xFFFFFF);
+			particle.am = 0.6f;
+			particle.setLifespan(0.6f);
+			particle.acc.set(0, +10);
+			particle.speed.polar(-Random.Float(3.1415926f), 6f);
+			particle.setSize(0f, 1.5f);
+			particle.sizeJitter = 1f;
+			particle.shuffleXY(1f);
+			float dst = Random.Float(1f);
+			particle.x -= dst;
+			particle.y += dst;
+		} else {
+			particle.am = 0.3f; // alpha
+			particle.acc.set(0, +6);
+			particle.setLifespan(5f);
+			particle.setSize(1f, 2f);
+			particle.speed.polar(Random.Float(PointF.PI2) * 0.75f, 0.3f);
+			if (Random.Int(2) == 0) {
+				particle.color(ColorMath.random(0xEE0000, 0x880000));
+			} else {
+				particle.color(ColorMath.random(0x000000, 0x000000));
+			}
+			particle.radiateXY(3.0f);
+			particle.x -= 2;
+			particle.y += 2;
+		}
 	}
-
 }
