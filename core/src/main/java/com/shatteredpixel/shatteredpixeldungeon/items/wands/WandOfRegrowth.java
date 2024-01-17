@@ -49,6 +49,7 @@ import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
 import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
 import com.shatteredpixel.shatteredpixeldungeon.mechanics.ConeAOE;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
+import com.shatteredpixel.shatteredpixeldungeon.plants.Clover;
 import com.shatteredpixel.shatteredpixeldungeon.plants.Plant;
 import com.shatteredpixel.shatteredpixeldungeon.plants.Sungrass;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
@@ -61,6 +62,7 @@ import com.watabou.utils.ColorMath;
 import com.watabou.utils.GameMath;
 import com.watabou.utils.PathFinder;
 import com.watabou.utils.Random;
+import com.watabou.utils.Reflection;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -73,7 +75,7 @@ public class WandOfRegrowth extends Wand {
 		//only used for targeting, actual projectile logic is Ballistica.STOP_SOLID
 		collisionProperties = Ballistica.WONT_STOP;
 	}
-	
+
 	private int totChrgUsed = 0;
 	private int chargesOverLimit = 0;
 
@@ -169,9 +171,14 @@ public class WandOfRegrowth extends Wand {
 		}
 
 		if (!cells.isEmpty() && Random.Float() > furrowedChance &&
-				(Random.Int(6) < chrgUsed)){ // 16%/33%/50% chance to spawn a seed pod or dewcatcher
+				(Random.Int(6) < chrgUsed)){ // 16%/33%/50% chance to spawn a special plant
 			int cell = cells.remove(0);
-			Dungeon.level.plant( Random.Int(2) == 0 ? new Seedpod.Seed() : new Dewcatcher.Seed(), cell);
+			Class<?>[] specials = new Class<?>[]{
+					Dewcatcher.Seed.class,
+					Seedpod.Seed.class,
+					Clover.Seed.class
+			};
+			Dungeon.level.plant((Plant.Seed) Reflection.newInstance(Random.element(specials)), cell);
 		}
 
 		if (!cells.isEmpty() && Random.Float() > furrowedChance &&
@@ -206,7 +213,7 @@ public class WandOfRegrowth extends Wand {
 		}
 
 	}
-	
+
 	private int chargeLimit( int heroLvl ){
 		if (level() >= 10){
 			return Integer.MAX_VALUE;
@@ -308,24 +315,24 @@ public class WandOfRegrowth extends Wand {
 		particle.x -= dst;
 		particle.y += dst;
 	}
-	
+
 	private static final String TOTAL = "totChrgUsed";
 	private static final String OVER = "chargesOverLimit";
-	
+
 	@Override
 	public void storeInBundle(Bundle bundle) {
 		super.storeInBundle(bundle);
 		bundle.put( TOTAL, totChrgUsed );
 		bundle.put( OVER, chargesOverLimit);
 	}
-	
+
 	@Override
 	public void restoreFromBundle(Bundle bundle) {
 		super.restoreFromBundle(bundle);
 		totChrgUsed = bundle.getInt(TOTAL);
 		chargesOverLimit = bundle.getInt(OVER);
 	}
-	
+
 	public static class Dewcatcher extends Plant{
 
 		{
