@@ -7,7 +7,7 @@ This fork adds:
 - a **wand of anti-magic**, which temporarily suppresses a target's magical abilities;
 - a **flying carpet** artifact;
 - a **Forgetful** challenge, which makes identification of potions and scrolls temporary;
-- a rare **Four-Leaf Clover** plant, which gives brief loot-related luck when trampled;
+- a rare **Four-Leaf Clover** plant, which gives loot-related luck when trampled;
 - and cosmetic changes related to the title.
 
 
