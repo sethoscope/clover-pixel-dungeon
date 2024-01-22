@@ -64,7 +64,7 @@ public class AboutScene extends PixelScene {
 
                 //*** Clover Pixel Dungeon Credits ***
 
-		final int CLOVER_COLOR = 0x5073FF;
+		final int CLOVER_COLOR = 0xD50000;
 		CreditsBlock cpx = new CreditsBlock(true, CLOVER_COLOR,
 				"Clover Pixel Dungeon",
                                 null,
