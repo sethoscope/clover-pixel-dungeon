@@ -250,6 +250,9 @@ abstract public class MissileWeapon extends Weapon {
 				SpiritBow bow = Dungeon.hero.belongings.getItem(SpiritBow.class);
 				if (bow != null && bow.enchantment != null && Dungeon.hero.buff(MagicImmune.class) == null) {
 					damage = bow.enchantment.proc(this, attacker, defender, damage);
+					if (bow.enchantment2 != null) {
+						damage = bow.enchantment2.proc(this, attacker, defender, damage);
+					}
 				}
 			}
 		}
@@ -453,6 +456,10 @@ abstract public class MissileWeapon extends Weapon {
 		if (enchantment != null && (cursedKnown || !enchantment.curse())){
 			info += "\n\n" + Messages.get(Weapon.class, "enchanted", enchantment.name());
 			info += " " + Messages.get(enchantment, "desc");
+			if (enchantment2 != null) {
+				info += "\n\n" + Messages.get(Weapon.class, "enchanted", enchantment2.name());
+				info += " " + enchantment2.desc();
+			}
 		}
 
 		if (cursed && isEquipped( Dungeon.hero )) {

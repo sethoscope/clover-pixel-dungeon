@@ -65,6 +65,8 @@ import com.shatteredpixel.shatteredpixeldungeon.items.spells.SummonElemental;
 import com.shatteredpixel.shatteredpixeldungeon.items.spells.TelekineticGrab;
 import com.shatteredpixel.shatteredpixeldungeon.items.spells.WildEnergy;
 import com.shatteredpixel.shatteredpixeldungeon.items.stones.Runestone;
+import com.shatteredpixel.shatteredpixeldungeon.items.stones.StoneOfDoubleEnchantment;
+import com.shatteredpixel.shatteredpixeldungeon.items.stones.StoneOfEnchantment;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.Wand;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -282,6 +284,11 @@ public class QuickRecipe extends Component {
 					ArrayList<Item> in = new ArrayList<Item>(Arrays.asList(scroll));
 					result.add(new QuickRecipe( r, in, r.sampleOutput(in)));
 				}
+				result.add(new QuickRecipe(
+						new StoneOfDoubleEnchantment.StoneRecipe(),
+						new ArrayList<Item>(
+							Arrays.asList(new StoneOfEnchantment(),new StoneOfEnchantment())),
+						new StoneOfDoubleEnchantment()));
 				return result;
 			case 2:
 				result.add(new QuickRecipe( new StewedMeat.oneMeat() ));

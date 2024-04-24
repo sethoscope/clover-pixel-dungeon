@@ -162,6 +162,10 @@ public class SpiritBow extends Weapon {
 			info += "\n\n" + Messages.capitalize(Messages.get(Weapon.class, "enchanted", enchantment.name()));
 			if (enchantHardened) info += " " + Messages.get(Weapon.class, "enchant_hardened");
 			info += " " + enchantment.desc();
+			if (enchantment2 != null) {
+				info += "\n\n" + Messages.get(Weapon.class, "enchanted", enchantment2.name());
+				info += " " + enchantment2.desc();
+			}
 		} else if (enchantHardened){
 			info += "\n\n" + Messages.get(Weapon.class, "hardened_no_enchant");
 		}

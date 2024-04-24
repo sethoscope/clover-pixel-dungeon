@@ -101,17 +101,29 @@ abstract public class Weapon extends KindOfWeapon {
 	private static final int USES_TO_ID = 20;
 	private float usesLeftToID = USES_TO_ID;
 	private float availableUsesToID = USES_TO_ID/2f;
-	
+
 	public Enchantment enchantment;
+	public Enchantment enchantment2;
 	public boolean enchantHardened = false;
 	public boolean curseInfusionBonus = false;
 	public boolean masteryPotionBonus = false;
 	
 	@Override
 	public int proc( Char attacker, Char defender, int damage ) {
-		
+
 		if (enchantment != null && attacker.buff(MagicImmune.class) == null) {
+			if ( enchantment2 != null && Random.Int(2) == 0 ) {
+				// Swap the enchantments sometimes to vary the icon and reverse the order
+				// in which they apply.
+				Enchantment swap = enchantment;
+				enchantment = enchantment2;
+				enchantment2 = swap;
+				updateQuickslot();
+			}
 			damage = enchantment.proc( this, attacker, defender, damage );
+			if (enchantment2 != null) {
+				damage = enchantment2.proc( this, attacker, defender, damage );
+			}
 		}
 		
 		if (!levelKnown && attacker == Dungeon.hero) {
@@ -139,6 +151,7 @@ abstract public class Weapon extends KindOfWeapon {
 	private static final String USES_LEFT_TO_ID = "uses_left_to_id";
 	private static final String AVAILABLE_USES  = "available_uses";
 	private static final String ENCHANTMENT	    = "enchantment";
+	private static final String ENCHANTMENT2	    = "enchantment2";
 	private static final String ENCHANT_HARDENED = "enchant_hardened";
 	private static final String CURSE_INFUSION_BONUS = "curse_infusion_bonus";
 	private static final String MASTERY_POTION_BONUS = "mastery_potion_bonus";
@@ -150,6 +163,7 @@ abstract public class Weapon extends KindOfWeapon {
 		bundle.put( USES_LEFT_TO_ID, usesLeftToID );
 		bundle.put( AVAILABLE_USES, availableUsesToID );
 		bundle.put( ENCHANTMENT, enchantment );
+		bundle.put( ENCHANTMENT2, enchantment2 );
 		bundle.put( ENCHANT_HARDENED, enchantHardened );
 		bundle.put( CURSE_INFUSION_BONUS, curseInfusionBonus );
 		bundle.put( MASTERY_POTION_BONUS, masteryPotionBonus );
@@ -162,6 +176,7 @@ abstract public class Weapon extends KindOfWeapon {
 		usesLeftToID = bundle.getFloat( USES_LEFT_TO_ID );
 		availableUsesToID = bundle.getFloat( AVAILABLE_USES );
 		enchantment = (Enchantment)bundle.get( ENCHANTMENT );
+		enchantment2 = (Enchantment)bundle.get( ENCHANTMENT2 );
 		enchantHardened = bundle.getBoolean( ENCHANT_HARDENED );
 		curseInfusionBonus = bundle.getBoolean( CURSE_INFUSION_BONUS );
 		masteryPotionBonus = bundle.getBoolean( MASTERY_POTION_BONUS );
@@ -286,6 +301,7 @@ abstract public class Weapon extends KindOfWeapon {
 			//otherwise chance to lose enchant is 10/20/40/80/100% when upgrading from +4/5/6/7/8
 			} else if (level() >= 4 && Random.Float(10) < Math.pow(2, level()-4)){
 				enchant(null);
+				enchant2(null);
 			}
 		}
 		
@@ -296,9 +312,14 @@ abstract public class Weapon extends KindOfWeapon {
 	
 	@Override
 	public String name() {
-		return enchantment != null && (cursedKnown || !enchantment.curse()) ? enchantment.name( super.name() ) : super.name();
+		String name = super.name();
+		if (enchantment != null && (cursedKnown || !enchantment.curse())) {
+			if (enchantment2 != null) name = enchantment2.name(name);
+			name = enchantment.name(name);
+		}
+		return name;
 	}
-	
+
 	@Override
 	public Item random() {
 		//+0: 75% (3/4)
@@ -325,7 +346,7 @@ abstract public class Weapon extends KindOfWeapon {
 
 		return this;
 	}
-	
+
 	public Weapon enchant( Enchantment ench ) {
 		if (ench == null || !ench.curse()) curseInfusionBonus = false;
 		enchantment = ench;
@@ -333,16 +354,30 @@ abstract public class Weapon extends KindOfWeapon {
 		return this;
 	}
 
+	public Weapon enchant2( Enchantment ench ) {
+		if (ench == null || !ench.curse()) curseInfusionBonus = false;
+		enchantment2 = ench;
+		updateQuickslot();
+		return this;
+	}
+
 	public Weapon enchant() {
-
 		Class<? extends Enchantment> oldEnchantment = enchantment != null ? enchantment.getClass() : null;
-		Enchantment ench = Enchantment.random( oldEnchantment );
+		Class<? extends Enchantment> oldEnchantment2 = enchantment2 != null ? enchantment2.getClass() : null;
+		return enchant(Enchantment.random( oldEnchantment, oldEnchantment2 ));
+	}
 
-		return enchant( ench );
+	public void enchant2() {
+		// add a random double enchantment; no curses, no choosing
+		curseInfusionBonus = false;
+		enchantment = Enchantment.random();
+		enchantment2 = Enchantment.random( enchantment.getClass() );
 	}
 
 	public boolean hasEnchant(Class<?extends Enchantment> type, Char owner) {
-		return enchantment != null && enchantment.getClass() == type && owner.buff(MagicImmune.class) == null;
+		return enchantment != null && owner.buff(MagicImmune.class) == null
+				&& (enchantment.getClass() == type
+					|| (enchantment2 != null && enchantment2.getClass() == type));
 	}
 	
 	//these are not used to process specific enchant effects, so magic immune doesn't affect them

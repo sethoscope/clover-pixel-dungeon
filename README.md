@@ -6,7 +6,8 @@ This fork adds:
 
 - a **wand of anti-magic**, which temporarily suppresses a target's magical abilities;
 - a **flying carpet** artifact;
-- a **Forgetful** challenge, which makes identification of potions and scrolls temporary; and
+- a **Forgetful** challenge, which makes identification of potions and scrolls temporary;
+- a **Stone of Double Enchantment**, which imbues a weapon with two enchantments simultaneously; and
 - a rare **Four-Leaf Clover** plant, which gives loot-related luck when trampled.
 
 
