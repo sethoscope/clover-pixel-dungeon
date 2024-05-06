@@ -5,10 +5,10 @@ Clover Pixel Dungeon is a fork of [Shattered Pixel Dungeon](https://shatteredpix
 This fork adds:
 
 - a **wand of anti-magic**, which temporarily suppresses a target's magical abilities;
-- a **flying carpet** artifact;
-- a **Forgetful** challenge, which makes identification of potions and scrolls temporary;
-- a **Stone of Double Enchantment**, which imbues a weapon with two enchantments simultaneously; and
-- a rare **Four-Leaf Clover** plant, which gives loot-related luck when trampled.
+- a **flying carpet artifact**, for flying over terrain at high speed;
+- a **Forgetful challenge**, which makes identification of potions and scrolls temporary;
+- a **stone of double enchantment**, which imbues a weapon with two enchantments simultaneously; and
+- a rare **four-leaf clover** plant, which grants loot-related luck when trampled.
 
 
 If you'd like to work with the code, you can find the following guides in `/docs`:
