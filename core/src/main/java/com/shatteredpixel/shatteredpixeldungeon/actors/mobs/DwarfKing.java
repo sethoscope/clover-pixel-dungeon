@@ -90,7 +90,7 @@ public class DwarfKing extends Mob {
 
 	@Override
 	public int damageRoll() {
-		return Random.NormalIntRange( 15, 25 );
+		return Char.combatRoll( 15, 25 );
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class DwarfKing extends Mob {
 
 	@Override
 	public int drRoll() {
-		return super.drRoll() + Random.NormalIntRange(0, 10);
+		return super.drRoll() + Char.combatRoll(0, 10);
 	}
 
 	private int phase = 1;
@@ -691,7 +691,7 @@ public class DwarfKing extends Mob {
 					}
 				} else {
 					Char ch = Actor.findChar(pos);
-					ch.damage(Random.NormalIntRange(20, 40), this);
+					ch.damage(Char.combatRoll(20, 40), this);
 					if (((DwarfKing)target).phase == 2){
 						if (Dungeon.isChallenged(Challenges.STRONGER_BOSSES)){
 							target.damage(target.HT/18, new KingDamager());
