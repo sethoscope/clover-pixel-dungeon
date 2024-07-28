@@ -57,9 +57,9 @@ public class FlyingCarpet extends Artifact {
 		exp = 0;
 		levelCap = 10;
 
-		charge = Math.min(level()+3, 10);
 		partialCharge = 0;
-		chargeCap = Math.min(level()+3, 10);
+		chargeCap = Math.min(level()+1, 10);
+		charge = chargeCap;
 
 		defaultAction = AC_FLY;  // really it just toggles
 	}
@@ -174,11 +174,18 @@ public class FlyingCarpet extends Artifact {
 		charge = Math.min(charge+amount, chargeCap+amount);
 		updateQuickslot();
 	}
-	
+
+	@Override
+	public void level(int value) {
+		super.level(value);
+                chargeCap = Math.min(level()+1, 10);
+	}
+
 	@Override
 	public Item upgrade() {
-		chargeCap = Math.min(chargeCap + 1, 10);
-		return super.upgrade();
+		super.upgrade();
+                chargeCap = Math.min(level()+1, 10);
+		return this;
 	}
 
 	private static final String STEALTHED = "stealthed";
@@ -266,7 +273,7 @@ public class FlyingCarpet extends Artifact {
 
 		@Override
 		public float iconFadePercent() {
-			return (4f - turnsToCost) / 4f;
+			return (3f - turnsToCost) / 3f;
 		}
 
 		@Override
@@ -315,7 +322,7 @@ public class FlyingCarpet extends Artifact {
 						GLog.p(Messages.get(this, "levelup"));
 						
 					}
-					turnsToCost = 4;
+					turnsToCost = 3;
 				}
 				updateQuickslot();
 			}
