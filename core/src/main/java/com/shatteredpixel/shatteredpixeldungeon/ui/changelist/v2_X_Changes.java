@@ -89,6 +89,131 @@ public class v2_X_Changes {
 		changes.hardlight(Window.TITLE_COLOR);
 		changeInfos.add(changes);
 
+		changes = new ChangeInfo("", false, null);
+		changes.hardlight(Window.TITLE_COLOR);
+		changeInfos.add(changes);
+
+		changes = new ChangeInfo("v2.5.3", false, null);
+		changes.hardlight(Window.TITLE_COLOR);
+		changeInfos.add(changes);
+
+		changes.addButton( new ChangeButton(new ItemSprite(ItemSpriteSheet.BOMB), "Bombs and Identification",
+				"I'm making a few changes as a followup to the removal of the bomb identification exploit in v2.5.0:\n" +
+				"\n" +
+				"Firstly _Stones of Detect Magic_ are a new item that replace stones of disarming. Each stone can be used on a piece of equipment to identify whether it is cursed, and whether it is enchanted/upgraded. This should give a few more options when it comes to IDing equipment. Stones of disarming will no longer appear, but existing ones will remain in runs in progress for now.",
+
+				"Secondly, here are a bunch of buffs aimed at making bombs themselves more useful:\n" +
+				"_- Bomb_ max damage +50% (this increases average damage by 33%)\n" +
+				"_- Bombs_ no longer bounce when thrown directly at characters\n" +
+				"_- Bombs_ no longer have damage falloff when characters aren't right on top of them\n" +
+				"_- Explosion-triggering effects_ (e.g. explosive traps, explosive curse) all benefit from the damage and falloff changes.\n" +
+				"_- Alchemy Bombs_ all benefit from the damage and falloff changes as well, and now deal explosion damage in a minimum AOE of 5x5 if they used to be 3x3.\n" +
+				"_- Flashbangs_ redesigned, they are now smoke bombs, and spread shrouding fog in a 5x5 AOE in addition to dealing damage.\n" +
+				"_- Shocks Bombs_ redesigned, they are now flashbangs, and deal +25% electricity damage and stun for 10 turns within their 5x5 AOE.\n" +
+				"_- Regrowth Bomb_ AOE size up to 7x7 from 5x5, now always generate at least 3 plants, up from 2."));
+
+		changes.addButton( new ChangeButton(new ItemSprite(ItemSpriteSheet.CHAOTIC_CENSER), "Item Balance Changes",
+				"The new trinkets are doing much better after v2.5.1, but there's still room to hand out a few buffs here. Most notably I want to address feedback where the Chaotic Censer seems to spawn gas too close to the hero too often:\n" +
+				"_- Chaotic Censer_ gas spawn range up to 2-5 tiles from 1-3\n" +
+				"_- Chaotic Censer_ gas volume reduced\n" +
+				"_- Chaotic Censer_ likelihood of spawning gas near enemies increased\n" +
+				"\n" +
+				"_- Salt Cube_ health regen loss reduced to 16/27/34/40%, from 20/33/43/50%\n" +
+				"\n" +
+				"I'm handing out a couple nerfs as well:\n" +
+				"_Stones of Aggression_ were meant to have some use during boss fights, but currently they're too strong in that case, especially with many challenges enabled.\n" +
+				"_-_ Bosses now take 1/2 damage from their minions when affected by aggression, the final boss specifically takes 1/4 damage.\n" +
+				"_-_ Aggression duration vs. regular enemies up to 20 turns, from 5.\n" +
+				"\n" +
+				"_- Mossy Clump_ upgrade cost reduction reverted, now costs 20/25/30 to upgrade again, up from 15/20/25"));
+
+		changes.addButton(new ChangeButton(Icons.get(Icons.PREFS), Messages.get(ChangesScene.class, "misc"),
+				"_-_ Vampiric no longer triggers on NPCs or allies\n" +
+				"_-_ Styli can now be used on known uncursed armor\n" +
+				"_-_ Wells of health and awareness descriptions are now more accurate\n" +
+				"_-_ DM-300 can no longer use an ability immediately after existing supercharge state\n" +
+				"_-_ Wraiths spawned by spectral necromancers are now more powerful"));
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.SPINNER, 144, 0, 16, 16), Messages.get(ChangesScene.class, "bugfixes"),
+				"Fixed the Following Bugs:\n" +
+				"_Caused by v2.5.0:_\n" +
+				"_-_ Various minor visual errors\n" +
+				"_-_ Very rare cases where ooze could trigger many times in a turn\n" +
+				"_-_ Cases where falling into chasms could affect level generation\n" +
+				"_-_ Corpse Dust unintentionally being set to droppable\n" +
+				"_-_ Upgrades to Sandals of Nature not counting in the new catalog\n" +
+				"_-_ Scroll of Upgrade uses counting twice in the new catalog\n" +
+				"_-_ Liquid Nature using the wrong position for thrown potions\n" +
+				"_-_ Invisibility vfx persisting in rare cases when they shouldn't\n" +
+				"\n" +
+				"_Existed Prior to v2.5.0:_\n" +
+				"_-_ Various rare crash bugs\n" +
+				"_-_ Various minor visual and textual errors\n" +
+				"_-_ One more rare levelgen freeze bug\n" +
+				"_-_ Wards not being targetable if they were in solid terrain\n" +
+				"_-_ Spawned mimics (e.g. via cursed wand) not scaling with ascension challenge"));
+
+		changes = new ChangeInfo("v2.5.2", false, null);
+		changes.hardlight(Window.TITLE_COLOR);
+		changeInfos.add(changes);
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.SPINNER, 144, 0, 16, 16), Messages.get(ChangesScene.class, "bugfixes"),
+				"Just a quick extra patch this time to fix a few more bugs:\n" +
+				"_Caused by v2.5.1:_\n" +
+				"_-_ Crashes when using transmutation abilities (sorry!)\n" +
+				"_-_ Shard of Oblivion description not using its new bonus loot rate\n" +
+				"\n" +
+				"_Caused by v2.5.0:_\n" +
+				"_-_ Dark floors sometimes giving 1/2 vision instead of the new value of 5/8\n" +
+				"_-_ Drop and throw actions not working on Shard of Oblivion\n" +
+				"_-_ Some flying characters visually falling into pits when they die that shouldn't (e.g. ghosts)\n" +
+				"_-_ Various minor textual errors\n" +
+				"\n" +
+				"_Existed Prior to v2.5.0:_\n" +
+				"_-_ Various minor visual bugs with stealthy mimics"));
+		
+		changes = new ChangeInfo("v2.5.1", false, null);
+		changes.hardlight(Window.TITLE_COLOR);
+		changeInfos.add(changes);
+
+		changes.addButton( new ChangeButton(new ItemSprite(ItemSpriteSheet.CHAOTIC_CENSER), "New Trinket Buffs",
+				"Based on some early balance data it looks like some of the new trinkets aren't quite hitting the mark. I'm open to more extensive changes after getting in some more data, but for now I'm doing some simple buffs:\n" +
+				"\n" +
+				"_- Chaotic Censer_ internal RNG adjusted, now much more likely to fire gas at useful times. Now also tries to avoid firing at all in shops or enclosed spaces, as long as you don't loiter there.\n" +
+				"\n" +
+				"_- Salt Cube_ health regen loss down to 20/33/43/50% from 30/50/65/75%. This means total HP granted per food item is now unchanged with the salt cube, the regen just happens more slowly.\n" +
+				"\n" +
+				"_- Shard of Oblivion_ bonus loot per unidentified item up to 20% from 12.5%."));
+
+		changes.addButton(new ChangeButton(Icons.get(Icons.PREFS), Messages.get(ChangesScene.class, "misc"),
+				"_-_ Jumping toward a distant well now clears it from the notes page\n" +
+				"_-_ Statue enemies no longer become passive again when ascending\n" +
+				"_-_ NPCs are now fooled by the disguise buff\n" +
+				"_-_ Sniper's Mark now shows its duration in its buff description\n" +
+				"_-_ Added Google Play Games achievements for the new researcher badges\n" +
+				"_-_ ShatteredPD is now categorized as a game on Android devices\n" +
+				"_-_ Updated Translations"));
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.SPINNER, 144, 0, 16, 16), Messages.get(ChangesScene.class, "bugfixes"),
+				"Fixed the following bugs:\n" +
+				"_Caused by v2.5.0:_\n" +
+				"_-_ Various crash and freeze bugs with the chaotic censer\n" +
+				"_-_ Goo and DM-300 benefitting from terrain while levitating\n" +
+				"_-_ Defeating temporarily transmogrified enemies not counting for the bestiary\n" +
+				"_-_ Underscores being incorrectly interpreted by the game in custom notes\n" +
+				"_-_ New 'remembering fullscreen monitor' functionality for desktop users not working properly\n" +
+				"_-_ Various minor textual and graphical errors\n" +
+				"\n" +
+				"_Existed Prior to v2.5.0:_\n" +
+				"_-_ Shopkeepers often failing to clear gasses from their shops\n" +
+				"_-_ Debuffs disappearing from DM-300's pylons on save/load\n" +
+				"_-_ Rare cases of levelgen hanging\n" +
+				"_-_ Game log spam during the tutorial in specific cases\n" +
+				"_-_ Corpse Dust sometimes spawning many wraiths in quick succession after spawning none\n" +
+				"_-_ Direction compass not pointing to exit after defeating Tengu\n" +
+				"_-_ Split alchemy guide not updating with inventory state in various cases\n" +
+				"_-_ Magic well note entries not being cleared if there are two wells in a level"));
+
 		changes = new ChangeInfo(Messages.get(ChangesScene.class, "new"), false, null);
 		changes.hardlight(Window.TITLE_COLOR);
 		changeInfos.add(changes);
@@ -219,7 +344,7 @@ public class v2_X_Changes {
 				"_-_ Various minor visual and textual errors\n" +
 				"_-_ Surface victory badges not being added to the rankings screen\n" +
 				"_-_ Very rare cases of players getting outside of boss arenas\n" +
-				"_-_ Settings defaulting to audio tab and not languages tab when user is using a language with an incomplete translation\n",
+				"_-_ Settings defaulting to audio tab and not languages tab when user is using a language with an incomplete translation",
 				
 				"_Effects:_\n" +
 				"_-_ Warrior being able to gain extra upgrades on his armor via hero armor transfer effect\n" +

@@ -323,7 +323,7 @@ public class DM300 extends Mob {
 
 		if (travelling) PixelScene.shake( supercharged ? 3 : 1, 0.25f );
 
-		if (Dungeon.level.map[pos] == Terrain.INACTIVE_TRAP && state == HUNTING) {
+		if (!flying && Dungeon.level.map[pos] == Terrain.INACTIVE_TRAP && state == HUNTING) {
 
 			//don't gain energy from cells that are energized
 			if (CavesBossLevel.PylonEnergy.volumeAt(pos, CavesBossLevel.PylonEnergy.class) > 0){
@@ -534,6 +534,9 @@ public class DM300 extends Mob {
 	public void loseSupercharge(){
 		supercharged = false;
 		((DM300Sprite)sprite).updateChargeState(false);
+
+		//adjust turns since last ability to prevent DM immediately using an ability when charge ends
+		turnsSinceLastAbility = Math.max(turnsSinceLastAbility, MIN_COOLDOWN-3);
 
 		if (pylonsActivated < totalPylonsToActivate()){
 			yell(Messages.get(this, "charge_lost"));
