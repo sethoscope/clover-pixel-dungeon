@@ -97,7 +97,8 @@ public class Tengu extends Mob {
 		HUNTING = new Hunting();
 		
 		properties.add(Property.BOSS);
-		
+		properties.add(Property.MAGIC);
+
 		viewDistance = 12;
 		jump_countdown = 0;
 	}

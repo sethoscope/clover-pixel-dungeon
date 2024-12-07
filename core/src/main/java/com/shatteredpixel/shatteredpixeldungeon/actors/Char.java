@@ -1202,6 +1202,7 @@ public abstract class Char extends Actor {
 		ELECTRIC ( new HashSet<Class>( Arrays.asList(WandOfLightning.class, Shocking.class, Potential.class,
 										Electricity.class, ShockingDart.class, Elemental.ShockElemental.class )),
 				new HashSet<Class>()),
+		MAGIC,
 		LARGE,
 		IMMOVABLE ( new HashSet<Class>(),
 				new HashSet<Class>( Arrays.asList(Vertigo.class) )),

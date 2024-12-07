@@ -81,6 +81,7 @@ public class YogDzewa extends Mob {
 		properties.add(Property.IMMOVABLE);
 		properties.add(Property.DEMONIC);
 		properties.add(Property.STATIC);
+		properties.add(Property.MAGIC);
 	}
 
 	private int phase = 0;

@@ -67,6 +67,7 @@ public class Succubus extends Mob {
 		lootChance = 0.33f;
 
 		properties.add(Property.DEMONIC);
+		properties.add(Property.MAGIC);
 	}
 	
 	@Override

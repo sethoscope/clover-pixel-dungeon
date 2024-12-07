@@ -47,7 +47,7 @@ public class CrystalWisp extends Mob{
 		maxLvl = -2;
 
 		flying = true;
-
+		properties.add(Property.MAGIC);
 		properties.add(Property.INORGANIC);
 	}
 

@@ -47,31 +47,58 @@ import java.util.HashMap;
 
 public class WandOfAntiMagic extends Wand {
 
+
+	private float storedEnergy;
 	{
 		image = ItemSpriteSheet.WAND_ANTIMAGIC;
 	}
-	
+
+	private int energyFrom(Mob ch) {
+		// Returns the amount of charge we get from zapping target ch.
+		// Assumes they are a magic target and not antimagicked.
+		int min = buffedLvl();
+		int max = 3 * (1+buffedLvl());
+		return Random.IntRange(min, max);
+	}
+
+	private int maxEnergy() {
+		// The maximum possible charge
+		return 10 * (1+buffedLvl());
+	}
+
 	@Override
 	public void onZap(Ballistica bolt) {
 		Char ch = Actor.findChar(bolt.collisionPos);
-
 		if (ch != null){
 			if (!(ch instanceof Mob)){
 				return;
 			}
-
 			Mob enemy = (Mob) ch;
-			debuffEnemy( enemy );
-			wandProc(ch, chargesPerCast());
-			Sample.INSTANCE.play( Assets.Sounds.HIT_MAGIC, 1, 0.8f * Random.Float(0.87f, 1.15f) );
-			
+			if (ch.properties().contains(Char.Property.MAGIC)
+				&& (ch.buff( AntiMagic.class ) == null)) {
+				wandProc(ch, chargesPerCast());
+				Sample.INSTANCE.play(Assets.Sounds.CHARGEUP, 1, 0.8f * Random.Float(0.87f, 1.15f));
+				storedEnergy += energyFrom(enemy);
+				storedEnergy = Math.min(storedEnergy, maxEnergy());
+				debuffEnemy(enemy);
+			} else {
+				// If a wand charged up more than it can currently contain, due to
+				// temporary buffs that are no longer in effect, the extra charge
+				// cannot be used to deal damage. The wand isn't powerful enough
+				// to manage the extra.
+				storedEnergy = Math.min(storedEnergy, maxEnergy());
+				ch.damage((int) Math.ceil(storedEnergy), this);
+				storedEnergy = 0;
+				Sample.INSTANCE.play(Assets.Sounds.HIT_MAGIC, 1, 0.8f * Random.Float(0.87f, 1.15f));
+			}
 		} else {
 			Dungeon.level.pressCell(bolt.collisionPos);
 		}
 	}
 	
 	private void debuffEnemy( Mob enemy ) {
-                Buff.prolong(enemy, AntiMagic.class, 2 + buffedLvl());
+		// TODO: charge up the wand
+        Buff.prolong(enemy, AntiMagic.class, 2 + buffedLvl());
 	}
 	
 	@Override

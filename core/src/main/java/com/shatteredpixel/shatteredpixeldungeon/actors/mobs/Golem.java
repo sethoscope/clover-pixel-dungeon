@@ -54,6 +54,7 @@ public class Golem extends Mob {
 
 		properties.add(Property.INORGANIC);
 		properties.add(Property.LARGE);
+		properties.add(Property.MAGIC);
 
 		WANDERING = new Wandering();
 		HUNTING = new Hunting();

@@ -60,6 +60,7 @@ public class DemonSpawner extends Mob {
 		properties.add(Property.MINIBOSS);
 		properties.add(Property.DEMONIC);
 		properties.add(Property.STATIC);
+		properties.add(Property.MAGIC);
 	}
 
 	@Override
