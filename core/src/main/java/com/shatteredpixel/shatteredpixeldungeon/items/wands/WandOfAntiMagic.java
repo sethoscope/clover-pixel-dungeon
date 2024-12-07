@@ -73,14 +73,16 @@ public class WandOfAntiMagic extends Wand {
 			if (!(ch instanceof Mob)){
 				return;
 			}
+			wandProc(ch, chargesPerCast());
 			Mob enemy = (Mob) ch;
 			if (ch.properties().contains(Char.Property.MAGIC)
-				&& (ch.buff( AntiMagic.class ) == null)) {
-				wandProc(ch, chargesPerCast());
+				&& ((ch.buff( AntiMagic.class ) == null) || storedEnergy == 0)) {
 				Sample.INSTANCE.play(Assets.Sounds.CHARGEUP, 1, 0.8f * Random.Float(0.87f, 1.15f));
-				storedEnergy += energyFrom(enemy);
+				if (ch.buff( AntiMagic.class ) == null) {
+					storedEnergy += energyFrom(enemy);
+				}
 				storedEnergy = Math.min(storedEnergy, maxEnergy());
-				debuffEnemy(enemy);
+				Buff.prolong(enemy, AntiMagic.class, 2 + buffedLvl());
 			} else {
 				// If a wand charged up more than it can currently contain, due to
 				// temporary buffs that are no longer in effect, the extra charge
@@ -94,11 +96,6 @@ public class WandOfAntiMagic extends Wand {
 		} else {
 			Dungeon.level.pressCell(bolt.collisionPos);
 		}
-	}
-	
-	private void debuffEnemy( Mob enemy ) {
-		// TODO: charge up the wand
-        Buff.prolong(enemy, AntiMagic.class, 2 + buffedLvl());
 	}
 	
 	@Override
