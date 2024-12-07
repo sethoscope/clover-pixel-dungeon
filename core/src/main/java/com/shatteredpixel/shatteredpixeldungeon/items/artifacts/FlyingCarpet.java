@@ -58,7 +58,7 @@ public class FlyingCarpet extends Artifact {
 		levelCap = 10;
 
 		partialCharge = 0;
-		chargeCap = Math.min(level()+1, 10);
+		chargeCap = Math.min(level()+3, 10);
 		charge = chargeCap;
 
 		defaultAction = AC_FLY;  // really it just toggles
@@ -178,13 +178,13 @@ public class FlyingCarpet extends Artifact {
 	@Override
 	public void level(int value) {
 		super.level(value);
-                chargeCap = Math.min(level()+1, 10);
+        chargeCap = Math.min(level()+3, 10);
 	}
 
 	@Override
 	public Item upgrade() {
 		super.upgrade();
-                chargeCap = Math.min(level()+1, 10);
+        chargeCap = Math.min(level()+3, 10);
 		return this;
 	}
 
