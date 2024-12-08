@@ -45,7 +45,6 @@ public class Bat extends Mob {
 		
 		flying = true;
 
-		properties.add(Property.MAGIC);
 		loot = new PotionOfHealing();
 		lootChance = 0.1667f; //by default, see lootChance()
 	}
@@ -74,13 +73,10 @@ public class Bat extends Mob {
 	@Override
 	public int attackProc( Char enemy, int damage ) {
 		damage = super.attackProc( enemy, damage );
-		if (buff( AntiMagic.class ) != null) {
-			int reg = Math.min( damage - 4, HT - HP );
-			
-			if (reg > 0) {
-				HP += reg;
-				sprite.showStatusWithIcon(CharSprite.POSITIVE, Integer.toString(reg), FloatingText.HEALING);
-			}
+		int reg = Math.min( damage - 4, HT - HP );
+		if (reg > 0) {
+			HP += reg;
+			sprite.showStatusWithIcon(CharSprite.POSITIVE, Integer.toString(reg), FloatingText.HEALING);
 		}
 		return damage;
 	}
