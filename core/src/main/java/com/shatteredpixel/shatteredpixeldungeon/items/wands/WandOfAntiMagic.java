@@ -53,7 +53,7 @@ public class WandOfAntiMagic extends Wand {
 		image = ItemSpriteSheet.WAND_ANTIMAGIC;
 	}
 
-	private int energyFrom(Mob ch) {
+	private int energyFrom(Char ch) {
 		// Returns the amount of charge we get from zapping target ch.
 		// Assumes they are a magic target and not antimagicked.
 		int min = buffedLvl();
@@ -64,6 +64,15 @@ public class WandOfAntiMagic extends Wand {
 	private int maxEnergy() {
 		// The maximum possible charge
 		return 10 * (1+buffedLvl());
+	}
+
+	private void absorbMagic(Char ch) {
+		if (ch.buff( AntiMagic.class ) == null) {
+			storedEnergy += energyFrom(ch);
+			storedEnergy = Math.min(storedEnergy, maxEnergy());
+			Sample.INSTANCE.play(Assets.Sounds.CHARGEUP, 1, 0.8f * Random.Float(0.87f, 1.15f));
+		}
+		Buff.prolong(ch, AntiMagic.class, 2 + buffedLvl());
 	}
 
 	@Override
@@ -77,17 +86,8 @@ public class WandOfAntiMagic extends Wand {
 			Mob enemy = (Mob) ch;
 			if (ch.properties().contains(Char.Property.MAGIC)
 				&& ((ch.buff( AntiMagic.class ) == null) || storedEnergy == 0)) {
-				Sample.INSTANCE.play(Assets.Sounds.CHARGEUP, 1, 0.8f * Random.Float(0.87f, 1.15f));
-				if (ch.buff( AntiMagic.class ) == null) {
-					storedEnergy += energyFrom(enemy);
-				}
-				storedEnergy = Math.min(storedEnergy, maxEnergy());
-				Buff.prolong(enemy, AntiMagic.class, 2 + buffedLvl());
+				absorbMagic(enemy);
 			} else {
-				// If a wand charged up more than it can currently contain, due to
-				// temporary buffs that are no longer in effect, the extra charge
-				// cannot be used to deal damage. The wand isn't powerful enough
-				// to manage the extra.
 				storedEnergy = Math.min(storedEnergy, maxEnergy());
 				ch.damage((int) Math.ceil(storedEnergy), this);
 				storedEnergy = 0;
@@ -100,11 +100,9 @@ public class WandOfAntiMagic extends Wand {
 	
 	@Override
 	public void onHit(MagesStaff staff, Char attacker, Char defender, int damage) {
-		// lvl 0 - 25%
-		// lvl 1 - 40%
-		// lvl 2 - 50%
-		if (Random.Int( buffedLvl() + 4 ) >= 3){
-			Buff.prolong( defender, AntiMagic.class, buffedLvl()/2.0f);
+		if (defender.properties().contains(Char.Property.MAGIC)
+		    && Random.Int( buffedLvl() + 4 ) >= 3) {
+			absorbMagic(defender);
 		}
 	}
 
