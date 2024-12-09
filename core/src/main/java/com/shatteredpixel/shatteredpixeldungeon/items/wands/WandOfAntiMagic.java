@@ -29,11 +29,13 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AntiMagic;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.effects.FloatingText;
 import com.shatteredpixel.shatteredpixeldungeon.effects.MagicMissile;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MagesStaff;
 import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Beam;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSpriteSheet;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
@@ -61,15 +63,16 @@ public class WandOfAntiMagic extends Wand {
 		return Random.IntRange(min, max);
 	}
 
-	private int maxEnergy() {
+	private float maxEnergy() {
 		// The maximum possible charge
 		return 10 * (1+buffedLvl());
 	}
 
 	private void absorbMagic(Char ch) {
 		if (ch.buff( AntiMagic.class ) == null) {
-			storedEnergy += energyFrom(ch);
-			storedEnergy = Math.min(storedEnergy, maxEnergy());
+			float energyGain = Math.min(energyFrom(ch), maxEnergy() - storedEnergy);
+			storedEnergy += energyGain;
+			Dungeon.hero.sprite.showStatusWithIcon(CharSprite.POSITIVE, Integer.toString((int) energyGain), FloatingText.ENERGY);
 			Sample.INSTANCE.play(Assets.Sounds.CHARGEUP, 1, 0.8f * Random.Float(0.87f, 1.15f));
 		}
 		Buff.prolong(ch, AntiMagic.class, 2 + buffedLvl());
