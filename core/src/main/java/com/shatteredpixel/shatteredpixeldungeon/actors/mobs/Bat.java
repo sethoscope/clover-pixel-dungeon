@@ -44,8 +44,8 @@ public class Bat extends Mob {
 		maxLvl = 15;
 		
 		flying = true;
-
-		loot = new PotionOfHealing();
+		
+		loot = PotionOfHealing.class;
 		lootChance = 0.1667f; //by default, see lootChance()
 	}
 	
