@@ -5,7 +5,6 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.Enchanting;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.Recipe;
-import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.exotic.ScrollOfEnchantment;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.SpiritBow;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon;
@@ -48,32 +47,15 @@ public class StoneOfDoubleEnchantment extends InventoryStone {
         return 8 * quantity;
     }
 
+    public static class StoneRecipe extends Recipe.SimpleRecipe {
+        {
+            inputs =  new Class[]{StoneOfEnchantment.class};
+            inQuantity = new int[]{2};
 
-    public static class StoneRecipe extends Recipe {
-        @Override
-        public boolean testIngredients(ArrayList<Item> ingredients) {
-            if (ingredients.size() != 2) return false;
-            return ingredients.get(0) instanceof StoneOfEnchantment
-                    && ingredients.get(1) instanceof StoneOfEnchantment;
-        }
+            cost = 8;
 
-        @Override
-        public int cost(ArrayList<Item> ingredients) {
-            return 8;
-        }
-
-        @Override
-        public Item brew(ArrayList<Item> ingredients) {
-            if (!testIngredients(ingredients)) return null;
-            ingredients.get(0).quantity(ingredients.get(0).quantity() - 1);
-            ingredients.get(1).quantity(ingredients.get(1).quantity() - 1);
-            return new StoneOfDoubleEnchantment();
-        }
-
-        @Override
-        public Item sampleOutput(ArrayList<Item> ingredients) {
-            if (!testIngredients(ingredients)) return null;
-            return new StoneOfDoubleEnchantment();
+            output = StoneOfDoubleEnchantment.class;
+            outQuantity = 1;
         }
     }
 }
