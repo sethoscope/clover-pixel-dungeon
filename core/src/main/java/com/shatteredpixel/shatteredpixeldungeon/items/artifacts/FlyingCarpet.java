@@ -35,7 +35,15 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Roots;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
+import com.shatteredpixel.shatteredpixeldungeon.items.Recipe;
+import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfHaste;
+import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfLevitation;
+import com.shatteredpixel.shatteredpixeldungeon.items.quest.MetalShard;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfEnergy;
+import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMagicMapping;
+import com.shatteredpixel.shatteredpixeldungeon.items.spells.ReclaimTrap;
+import com.shatteredpixel.shatteredpixeldungeon.items.stones.StoneOfDoubleEnchantment;
+import com.shatteredpixel.shatteredpixeldungeon.items.stones.StoneOfEnchantment;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
@@ -54,11 +62,10 @@ public class FlyingCarpet extends Artifact {
 	{
 		image = ItemSpriteSheet.ARTIFACT_CARPET;
 
-		exp = 0;
 		levelCap = 10;
 
 		partialCharge = 0;
-		chargeCap = Math.min(level()+3, 10);
+		chargeCap = Math.min(level()+3, 10);  // TODO: scale linearly throughout levels 0-10
 		charge = chargeCap;
 
 		defaultAction = AC_FLY;  // really it just toggles
@@ -170,25 +177,20 @@ public class FlyingCarpet extends Artifact {
 		}
 	}
 
-	public void overCharge(int amount){
-		charge = Math.min(charge+amount, chargeCap+amount);
-		updateQuickslot();
-	}
-
 	@Override
 	public void level(int value) {
-		super.level(value);
-        chargeCap = Math.min(level()+3, 10);
+		super.level(Math.min(value, levelCap));
+                chargeCap = Math.min(level()+3, 10);
 	}
 
 	@Override
 	public Item upgrade() {
+		if ( level() >= levelCap ) return this;
 		super.upgrade();
-        chargeCap = Math.min(level()+3, 10);
+		chargeCap = Math.min(level()+3, 10);
 		return this;
 	}
 
-	private static final String STEALTHED = "stealthed";
 	private static final String BUFF = "buff";
 
 	@Override
@@ -218,7 +220,7 @@ public class FlyingCarpet extends Artifact {
 					GLog.i( Messages.get(FlyingCarpet.class, "no_haste") );
 					Buff.detach(target, Haste.class);
 				}
-			} else if (charge < chargeCap && !cursed && target.buff(MagicImmune.class) == null) {
+			} else if (charge < chargeCap && target.buff(MagicImmune.class) == null) {
 				LockedFloor lock = target.buff(LockedFloor.class);
 				if (activeBuff == null && (lock == null || lock.regenOn())) {
 					float missing = (chargeCap - charge);
@@ -304,24 +306,6 @@ public class FlyingCarpet extends Artifact {
 					GLog.w(Messages.get(this, "no_charge"));
 					((Hero) target).interrupt();
 				} else {
-					//target hero level is 1 + 2*carpet level
-					int lvlDiffFromTarget = ((Hero) target).lvl - (1+level()*2);
-					//plus an extra one for each level after 6
-					if (level() >= 7){
-						lvlDiffFromTarget -= level()-6;
-					}
-					if (lvlDiffFromTarget >= 0){
-						exp += Math.round(10f * Math.pow(1.1f, lvlDiffFromTarget));
-					} else {
-						exp += Math.round(10f * Math.pow(0.75f, -lvlDiffFromTarget));
-					}
-					
-					if (exp >= (level() + 1) * 50 && level() < levelCap) {
-						upgrade();
-						exp -= level() * 50;
-						GLog.p(Messages.get(this, "levelup"));
-						
-					}
 					turnsToCost = 3;
 				}
 				updateQuickslot();
@@ -355,8 +339,7 @@ public class FlyingCarpet extends Artifact {
 		}
 		
 		private static final String TURNSTOCOST = "turnsToCost";
-		private static final String BARRIER_INC = "barrier_inc";
-		
+
 		@Override
 		public void storeInBundle(Bundle bundle) {
 			super.storeInBundle(bundle);
@@ -374,6 +357,10 @@ public class FlyingCarpet extends Artifact {
 	@Override
 	public String desc() {
 		String desc = super.desc();
+		if ( level() < levelCap ) {
+			desc += "\n\n" + Messages.get(this, "desc_upgradable");
+		}
+
 		if ( isEquipped( Dungeon.hero ) ){
 			if (cursed) {
 				desc += "\n\n" +Messages.get(this, "desc_cursed");
@@ -381,4 +368,69 @@ public class FlyingCarpet extends Artifact {
 		}
 		return desc;
 	}
+
+	public static class FlyingCarpetRecipe extends Recipe.SimpleRecipe {
+
+		protected int levelsPerBrew;
+
+		{
+			inputs =  new Class[]{
+					FlyingCarpet.class, PotionOfLevitation.class, PotionOfHaste.class
+			};
+			inQuantity = new int[]{1, 1, 1};
+			levelsPerBrew = 2;
+		}
+
+		private boolean canUpgrade(FlyingCarpet carpet) {
+			return carpet.level() < carpet.levelCap;
+		}
+
+		public int cost(ArrayList<Item> ingredients){
+			return 2 + findCarpet(ingredients).level();
+		}
+
+		@Override
+		public Item brew(ArrayList<Item> ingredients) {
+			if (!testIngredients(ingredients)) return null;
+			FlyingCarpet newCarpet = null;
+			Hero hero = Dungeon.hero;
+			for (Item ingredient : ingredients) {
+				if (ingredient.getClass() == FlyingCarpet.class) {
+					final FlyingCarpet carpet = (FlyingCarpet) ingredient;
+					if (!canUpgrade(carpet)) return null;
+					newCarpet = (FlyingCarpet) carpet.duplicate();
+					newCarpet.upgrade(levelsPerBrew);
+					carpet.quantity(0);
+				} else {
+					ingredient.quantity(ingredient.quantity() - 1);
+				}
+			}
+			return newCarpet;
+		}
+
+		public boolean testIngredients(ArrayList<Item> ingredients) {
+			FlyingCarpet carpet = findCarpet(ingredients);
+			if (carpet == null || !canUpgrade(carpet)) return false;
+			Hero hero = Dungeon.hero;
+			return super.testIngredients(ingredients);
+		}
+
+		@Override
+		public Item sampleOutput(ArrayList<Item> ingredients) {
+			if (!testIngredients(ingredients)) return null;
+			FlyingCarpet carpet = findCarpet(ingredients);
+			if (!canUpgrade(carpet)) return null;
+			return carpet.duplicate().upgrade(2);
+		}
+
+		public FlyingCarpet findCarpet(ArrayList<Item> ingredients) {
+			for (Item ingredient : ingredients) {
+				if (ingredient.getClass() == FlyingCarpet.class) {
+					return (FlyingCarpet) ingredient;
+				}
+			}
+			return null;
+		}
+	}
+
 }
