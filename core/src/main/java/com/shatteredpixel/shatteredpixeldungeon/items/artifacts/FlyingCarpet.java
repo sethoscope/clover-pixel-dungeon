@@ -59,13 +59,22 @@ import java.util.ArrayList;
 
 public class FlyingCarpet extends Artifact {
 
+/**
+level  charges   speed   range upgrade cost
+   0      3       2.0      6      4
+   2      4       2.4     10      5
+   4      5       2.8     14      6
+   6      6       3.2     19      7
+   8      7       3.6     25      8
+  10      8       4.0     32      
+ **/
 	{
 		image = ItemSpriteSheet.ARTIFACT_CARPET;
 
 		levelCap = 10;
 
 		partialCharge = 0;
-		chargeCap = Math.min(level()+3, 10);  // TODO: scale linearly throughout levels 0-10
+		chargeCap = chargeCap_();
 		charge = chargeCap;
 
 		defaultAction = AC_FLY;  // really it just toggles
@@ -73,6 +82,14 @@ public class FlyingCarpet extends Artifact {
 
 	public static final String AC_FLY = "FLY";
 	public static final String AC_STOP = "STOP";
+
+	int chargeCap_() {
+		return level()/2 + 3;
+	}
+
+	public float speedFactor() {
+		return 2.0f + level()/5.0f;
+	}
 
 	@Override
 	public ArrayList<String> actions( Hero hero ) {
@@ -160,7 +177,10 @@ public class FlyingCarpet extends Artifact {
 
 	@Override
 	protected ArtifactBuff activeBuff( ) {
-		return new carpetFlying();
+          carpetFlying buff = new carpetFlying();
+          buff.speedFactor(speedFactor());
+          return buff;
+          
 	}
 	
 	@Override
@@ -180,14 +200,16 @@ public class FlyingCarpet extends Artifact {
 	@Override
 	public void level(int value) {
 		super.level(Math.min(value, levelCap));
-                chargeCap = Math.min(level()+3, 10);
+                chargeCap = chargeCap_();
+		if (activeBuff != null) ((carpetFlying) activeBuff).speedFactor(speedFactor());
 	}
 
 	@Override
 	public Item upgrade() {
 		if ( level() >= levelCap ) return this;
 		super.upgrade();
-		chargeCap = Math.min(level()+3, 10);
+		chargeCap = chargeCap_();
+		if (activeBuff != null) ((carpetFlying) activeBuff).speedFactor(speedFactor());
 		return this;
 	}
 
@@ -261,8 +283,22 @@ public class FlyingCarpet extends Artifact {
 			type = buffType.POSITIVE;
 		}
 		
-		int turnsToCost = 0;
+		void carpetFlying(float speedFactor) {
+			this.speedFactor_ = speedFactor;
+		}
 
+		int turnsToCost = 0;
+		public float speedFactor_ = 2.0f;
+
+		public float speedFactor() {
+			return speedFactor_;
+		}
+          
+		public float speedFactor(float speedFactor) {
+			this.speedFactor_ = speedFactor;
+			return speedFactor_;
+		}
+          
 		@Override
 		public int icon() {
 			return BuffIndicator.LEVITATION;
@@ -357,6 +393,11 @@ public class FlyingCarpet extends Artifact {
 	@Override
 	public String desc() {
 		String desc = super.desc();
+
+			if ( isIdentified() ) {
+			desc += "\n\n" + Messages.get(this, "stats", Messages.decimalFormat("#.#", speedFactor()));
+                }
+
 		if ( level() < levelCap ) {
 			desc += "\n\n" + Messages.get(this, "desc_upgradable");
 		}
@@ -386,7 +427,7 @@ public class FlyingCarpet extends Artifact {
 		}
 
 		public int cost(ArrayList<Item> ingredients){
-			return 2 + findCarpet(ingredients).level();
+			return 4 + findCarpet(ingredients).level()/2;
 		}
 
 		@Override

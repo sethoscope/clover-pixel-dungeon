@@ -772,7 +772,9 @@ public abstract class Char extends Actor {
 	
 	public float speed() {
 		float speed = baseSpeed;
-		if ( buff( FlyingCarpet.carpetFlying.class ) != null ) return baseSpeed * 3f;
+		if ( buff( FlyingCarpet.carpetFlying.class ) != null ) {
+			return baseSpeed * ((FlyingCarpet.carpetFlying) buff( FlyingCarpet.carpetFlying.class )).speedFactor();
+                }
 		if ( buff( Cripple.class ) != null ) speed /= 2f;
 		if ( buff( Stamina.class ) != null) speed *= 1.5f;
 		if ( buff( Adrenaline.class ) != null) speed *= 2f;
