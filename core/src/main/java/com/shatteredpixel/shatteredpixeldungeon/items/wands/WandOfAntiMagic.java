@@ -63,9 +63,29 @@ public class WandOfAntiMagic extends Wand {
 		return Random.IntRange(min, max);
 	}
 
-	private float maxEnergy() {
+	private float maxEnergy(int level) {
 		// The maximum possible charge
-		return 10 * (1+buffedLvl());
+		return 10 * (1+level);
+	}
+
+	private float maxEnergy() {
+		return maxEnergy(buffedLvl());
+	}
+
+	@Override
+	public String statsDesc(){
+		if (levelKnown)
+			return Messages.get(this, "stats_desc", duration(), (int) storedEnergy, (int) maxEnergy());
+		else
+			return Messages.get(this, "stats_desc", duration(0), (int) storedEnergy, (int) maxEnergy(0));
+	}
+
+	private int duration(int level) {
+		return 2 + level;
+	}
+
+	private int duration() {
+		return duration(buffedLvl());
 	}
 
 	private void absorbMagic(Char ch) {
@@ -75,7 +95,7 @@ public class WandOfAntiMagic extends Wand {
 			Dungeon.hero.sprite.showStatusWithIcon(CharSprite.POSITIVE, Integer.toString((int) energyGain), FloatingText.ENERGY);
 			Sample.INSTANCE.play(Assets.Sounds.CHARGEUP, 1, 0.8f * Random.Float(0.87f, 1.15f));
 		}
-		Buff.prolong(ch, AntiMagic.class, 2 + buffedLvl());
+		Buff.prolong(ch, AntiMagic.class, duration());
 	}
 
 	@Override
