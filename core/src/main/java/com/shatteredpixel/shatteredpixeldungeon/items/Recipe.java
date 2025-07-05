@@ -262,9 +262,7 @@ public abstract class Recipe {
 		if (item instanceof EquipableItem){
 			//only thrown weapons and wands allowed among equipment items
 			return item.isIdentified() && !item.cursed &&
-					(item instanceof MissileWeapon
-							|| (item instanceof FlyingCarpet
-								&& !item.isEquipped(Dungeon.hero)));
+					(item instanceof MissileWeapon || item instanceof FlyingCarpet);
 		} else if (item instanceof Wand) {
 			return item.isIdentified() && !item.cursed;
 		} else {

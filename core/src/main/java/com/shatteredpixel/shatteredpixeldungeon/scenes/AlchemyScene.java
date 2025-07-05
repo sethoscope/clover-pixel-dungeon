@@ -32,6 +32,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Belongings;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.SparkParticle;
 import com.shatteredpixel.shatteredpixeldungeon.items.EnergyCrystal;
+import com.shatteredpixel.shatteredpixeldungeon.items.EquipableItem;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.LiquidMetal;
 import com.shatteredpixel.shatteredpixeldungeon.items.Recipe;
@@ -302,6 +303,11 @@ public class AlchemyScene extends PixelScene {
 															if (item instanceof LiquidMetal){
 																inputs[i].item(item.detachAll(Dungeon.hero.belongings.backpack));
 															} else {
+																// The FlyingCarpet needs to be unequipped
+																if ( item instanceof EquipableItem &&
+																		((EquipableItem) item).isEquipped(Dungeon.hero) ) {
+																	((EquipableItem) item).doUnequip(Dungeon.hero, true);
+																}
 																inputs[i].item(item.detach(Dungeon.hero.belongings.backpack));
 															}
 															break;
@@ -573,6 +579,11 @@ public class AlchemyScene extends PixelScene {
 							if (item instanceof LiquidMetal){
 								inputs[i].item(item.detachAll(Dungeon.hero.belongings.backpack));
 							} else {
+								// The FlyingCarpet needs to be unequipped
+								if ( item instanceof EquipableItem &&
+										((EquipableItem) item).isEquipped(Dungeon.hero) ) {
+									((EquipableItem) item).doUnequip(Dungeon.hero, true);
+								}
 								inputs[i].item(item.detach(Dungeon.hero.belongings.backpack));
 							}
 							break;
@@ -795,6 +806,11 @@ public class AlchemyScene extends PixelScene {
 				if (finding instanceof LiquidMetal) {
 					detached = found.get(0).detachAll(inventory.backpack);
 				} else {
+					// The FlyingCarpet needs to be unequipped
+					if ( finding instanceof EquipableItem &&
+							((EquipableItem) finding).isEquipped(Dungeon.hero) ) {
+						((EquipableItem) finding).doUnequip(Dungeon.hero, true);
+					}
 					detached = found.get(0).detach(inventory.backpack);
 				}
 				inputs[curslot].item(detached);
