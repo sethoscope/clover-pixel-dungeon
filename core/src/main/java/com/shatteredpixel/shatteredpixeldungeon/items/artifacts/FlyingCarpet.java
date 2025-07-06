@@ -444,6 +444,21 @@ level  charges   speed   range upgrade cost
 			return newCarpet;
 		}
 
+		public ArrayList<Item> getIngredients() {
+			ArrayList<Item> result = new ArrayList<>();
+			// Use their carpet in the guide if they have one. That way it will show
+			// the upgrade effect and cost for the carpet they have.
+			FlyingCarpet carpet = Dungeon.hero.belongings.getItem(FlyingCarpet.class);
+			if (carpet == null)
+				carpet = new FlyingCarpet();
+			else
+				carpet = (FlyingCarpet) carpet.duplicate();  // to make getAllSimilar() work, for QuickRecipe
+			result.add(carpet);
+			result.add(new PotionOfLevitation());
+			result.add(new PotionOfHaste());
+			return result;
+		}
+
 		public boolean testIngredients(ArrayList<Item> ingredients) {
 			FlyingCarpet carpet = findCarpet(ingredients);
 			if (carpet == null || !canUpgrade(carpet)) return false;
@@ -454,11 +469,11 @@ level  charges   speed   range upgrade cost
 		@Override
 		public Item sampleOutput(ArrayList<Item> ingredients) {
 			FlyingCarpet carpet = findCarpet(ingredients);
-			if (carpet == null) {
-				// This must be for the guide. We'll come up with a carpet.
-				carpet = new FlyingCarpet();
-				//carpet.identify();  // identify it so the output is visibly upgraded
+			if (ingredients == null) {
+				// This must be for the guide. Use their carpet if they have one.
+				carpet = Dungeon.hero.belongings.getItem(FlyingCarpet.class);
 			}
+			if (carpet == null) carpet = new FlyingCarpet();
 			if (!canUpgrade(carpet)) return null;
 			return carpet.duplicate().upgrade(2);
 		}
