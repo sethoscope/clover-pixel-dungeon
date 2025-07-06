@@ -38,12 +38,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.Recipe;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfHaste;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfLevitation;
-import com.shatteredpixel.shatteredpixeldungeon.items.quest.MetalShard;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfEnergy;
-import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMagicMapping;
-import com.shatteredpixel.shatteredpixeldungeon.items.spells.ReclaimTrap;
-import com.shatteredpixel.shatteredpixeldungeon.items.stones.StoneOfDoubleEnchantment;
-import com.shatteredpixel.shatteredpixeldungeon.items.stones.StoneOfEnchantment;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
@@ -410,7 +405,7 @@ level  charges   speed   range upgrade cost
 		return desc;
 	}
 
-	public static class FlyingCarpetRecipe extends Recipe.SimpleRecipe {
+	public static class Recipe extends com.shatteredpixel.shatteredpixeldungeon.items.Recipe.SimpleRecipe {
 
 		protected int levelsPerBrew;
 
@@ -458,13 +453,18 @@ level  charges   speed   range upgrade cost
 
 		@Override
 		public Item sampleOutput(ArrayList<Item> ingredients) {
-			if (!testIngredients(ingredients)) return null;
 			FlyingCarpet carpet = findCarpet(ingredients);
+			if (carpet == null) {
+				// This must be for the guide. We'll come up with a carpet.
+				carpet = new FlyingCarpet();
+				//carpet.identify();  // identify it so the output is visibly upgraded
+			}
 			if (!canUpgrade(carpet)) return null;
 			return carpet.duplicate().upgrade(2);
 		}
 
 		public FlyingCarpet findCarpet(ArrayList<Item> ingredients) {
+			if (ingredients == null) return null;
 			for (Item ingredient : ingredients) {
 				if (ingredient.getClass() == FlyingCarpet.class) {
 					return (FlyingCarpet) ingredient;
