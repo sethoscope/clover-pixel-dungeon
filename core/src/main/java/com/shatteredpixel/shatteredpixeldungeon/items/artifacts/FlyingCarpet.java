@@ -35,7 +35,6 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Roots;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
-import com.shatteredpixel.shatteredpixeldungeon.items.Recipe;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfHaste;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfLevitation;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfEnergy;
@@ -195,7 +194,7 @@ level  charges   speed   range upgrade cost
 	@Override
 	public void level(int value) {
 		super.level(Math.min(value, levelCap));
-                chargeCap = chargeCap_();
+		chargeCap = chargeCap_();
 		if (activeBuff != null) ((carpetFlying) activeBuff).speedFactor(speedFactor());
 	}
 
@@ -277,10 +276,6 @@ level  charges   speed   range upgrade cost
 		{
 			type = buffType.POSITIVE;
 		}
-		
-		void carpetFlying(float speedFactor) {
-			this.speedFactor_ = speedFactor;
-		}
 
 		int turnsToCost = 0;
 		public float speedFactor_ = 2.0f;
@@ -289,9 +284,8 @@ level  charges   speed   range upgrade cost
 			return speedFactor_;
 		}
           
-		public float speedFactor(float speedFactor) {
+		public void speedFactor(float speedFactor) {
 			this.speedFactor_ = speedFactor;
-			return speedFactor_;
 		}
           
 		@Override
@@ -429,7 +423,6 @@ level  charges   speed   range upgrade cost
 		public Item brew(ArrayList<Item> ingredients) {
 			if (!testIngredients(ingredients)) return null;
 			FlyingCarpet newCarpet = null;
-			Hero hero = Dungeon.hero;
 			for (Item ingredient : ingredients) {
 				if (ingredient.getClass() == FlyingCarpet.class) {
 					final FlyingCarpet carpet = (FlyingCarpet) ingredient;
@@ -462,7 +455,6 @@ level  charges   speed   range upgrade cost
 		public boolean testIngredients(ArrayList<Item> ingredients) {
 			FlyingCarpet carpet = findCarpet(ingredients);
 			if (carpet == null || !canUpgrade(carpet)) return false;
-			Hero hero = Dungeon.hero;
 			return super.testIngredients(ingredients);
 		}
 
