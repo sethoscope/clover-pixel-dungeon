@@ -807,9 +807,11 @@ public class AlchemyScene extends PixelScene {
 					detached = found.get(0).detachAll(inventory.backpack);
 				} else {
 					// The FlyingCarpet needs to be unequipped
-					if ( finding instanceof EquipableItem &&
-							((EquipableItem) finding).isEquipped(Dungeon.hero) ) {
-						((EquipableItem) finding).doUnequip(Dungeon.hero, true);
+					if ( finding instanceof EquipableItem ) {
+						EquipableItem item = (EquipableItem) found.get(0);
+						if (item.isEquipped(Dungeon.hero)) {
+							item.doUnequip(Dungeon.hero, true);
+						}
 					}
 					detached = found.get(0).detach(inventory.backpack);
 				}
