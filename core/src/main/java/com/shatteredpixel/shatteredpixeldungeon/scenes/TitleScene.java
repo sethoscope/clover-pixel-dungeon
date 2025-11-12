@@ -32,31 +32,49 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.BannerSprites;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Fireball;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Languages;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
-import com.shatteredpixel.shatteredpixeldungeon.services.news.News;
-import com.shatteredpixel.shatteredpixeldungeon.services.updates.AvailableUpdateData;
-import com.shatteredpixel.shatteredpixeldungeon.services.updates.Updates;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
-import com.shatteredpixel.shatteredpixeldungeon.ui.Archs;
 import com.shatteredpixel.shatteredpixeldungeon.ui.ExitButton;
+import com.shatteredpixel.shatteredpixeldungeon.ui.IconButton;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Icons;
 import com.shatteredpixel.shatteredpixeldungeon.ui.StyledButton;
+import com.shatteredpixel.shatteredpixeldungeon.ui.TitleBackground;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Window;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndSettings;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndVictoryCongrats;
 import com.watabou.glwrap.Blending;
+import com.watabou.input.PointerEvent;
 import com.watabou.noosa.BitmapText;
 import com.watabou.noosa.Camera;
 import com.watabou.noosa.Game;
 import com.watabou.noosa.Image;
+import com.watabou.noosa.PointerArea;
 import com.watabou.noosa.audio.Music;
+import com.watabou.noosa.tweeners.Tweener;
 import com.watabou.utils.ColorMath;
 import com.watabou.utils.DeviceCompat;
+import com.watabou.utils.GameMath;
+import com.watabou.utils.RectF;
 
 import java.util.Date;
 
 public class TitleScene extends PixelScene {
-	
+
+	private Image title;
+	private Fireball leftFB;
+	private Fireball rightFB;
+	private Image signs;
+
+	private StyledButton btnPlay;
+	private StyledButton btnRankings;
+	private StyledButton btnJournal;
+	private StyledButton btnSettings;
+	private StyledButton btnAbout;
+
+	private BitmapText version;
+	private IconButton btnFade;
+	private ExitButton btnExit;
+
 	@Override
 	public void create() {
 		
@@ -71,35 +89,40 @@ public class TitleScene extends PixelScene {
 		
 		int w = Camera.main.width;
 		int h = Camera.main.height;
-		
-		Archs archs = new Archs();
-		archs.setSize( w, h );
-		add( archs );
 
-		Image title = BannerSprites.get( landscape() ? BannerSprites.Type.TITLE_LAND : BannerSprites.Type.TITLE_PORT);
+		RectF insets = getCommonInsets();
+
+		TitleBackground BG = new TitleBackground( w, h );
+		add( BG );
+
+		w -= insets.left + insets.right;
+		h -= insets.top + insets.bottom;
+
+		title = BannerSprites.get( landscape() ? BannerSprites.Type.TITLE_LAND : BannerSprites.Type.TITLE_PORT);
 		add( title );
 
 		float topRegion = Math.max(title.height - 6, h*0.45f);
 
-		title.x = (w - title.width()) / 2f;
-		title.y = 2 + (topRegion - title.height()) / 2f;
+		title.x = insets.left + (w - title.width()) / 2f;
+		title.y = insets.top + 2 + (topRegion - title.height()) / 2f;
 
 		align(title);
 
 		if (landscape()){
-			placeTorch(title.x + 24, title.y + 66);
-			placeTorch(title.x + title.width - 24, title.y + 66);
+			leftFB = placeTorch(title.x + 24, title.y + 66);
+			rightFB = placeTorch(title.x + title.width - 24, title.y + 66);
 		} else {
-			placeTorch(title.x + 24, title.y + 66);
-			placeTorch(title.x + title.width - 24, title.y + 66);
+			leftFB = placeTorch(title.x + 24, title.y + 66);
+			rightFB = placeTorch(title.x + title.width - 24, title.y + 66);
 		}
 
-		Image signs = new Image(BannerSprites.get( landscape() ? BannerSprites.Type.TITLE_GLOW_LAND : BannerSprites.Type.TITLE_GLOW_PORT)){
+		signs = new Image(BannerSprites.get( landscape() ? BannerSprites.Type.TITLE_GLOW_LAND : BannerSprites.Type.TITLE_GLOW_PORT)){
 			private float time = 0;
 			@Override
 			public void update() {
 				super.update();
 				am = Math.max(0f, (float)Math.sin( time += Game.elapsed ));
+				am = Math.min(am, title.am);
 				if (time >= 1.5f*Math.PI) time = 0;
 			}
 			@Override
@@ -115,7 +138,7 @@ public class TitleScene extends PixelScene {
 
 		final Chrome.Type GREY_TR = Chrome.Type.GREY_BUTTON_TR;
 		
-		StyledButton btnPlay = new StyledButton(GREY_TR, Messages.get(this, "enter")){
+		btnPlay = new StyledButton(GREY_TR, Messages.get(this, "enter")){
 			@Override
 			protected void onClick() {
 				if (GamesInProgress.checkAll().size() == 0){
@@ -142,7 +165,7 @@ public class TitleScene extends PixelScene {
 		btnPlay.icon(Icons.get(Icons.ENTER));
 		add(btnPlay);
 
-		StyledButton btnRankings = new StyledButton(GREY_TR,Messages.get(this, "rankings")){
+		btnRankings = new StyledButton(GREY_TR,Messages.get(this, "rankings")){
 			@Override
 			protected void onClick() {
 				ShatteredPixelDungeon.switchNoFade( RankingsScene.class );
@@ -152,27 +175,19 @@ public class TitleScene extends PixelScene {
 		add(btnRankings);
 		Dungeon.daily = Dungeon.dailyReplay = false;
 
-		StyledButton btnBadges = new StyledButton(GREY_TR, Messages.get(this, "journal")){
+		btnJournal = new StyledButton(GREY_TR, Messages.get(this, "journal")){
 			@Override
 			protected void onClick() {
 				ShatteredPixelDungeon.switchNoFade( JournalScene.class );
 			}
 		};
-		btnBadges.icon(Icons.get(Icons.JOURNAL));
-		add(btnBadges);
+		btnJournal.icon(Icons.get(Icons.JOURNAL));
+		add(btnJournal);
 
-		StyledButton btnNews = new NewsButton(GREY_TR, Messages.get(this, "news"));
-		btnNews.icon(Icons.get(Icons.NEWS));
-		add(btnNews);
-
-		StyledButton btnChanges = new ChangesButton(GREY_TR, Messages.get(this, "changes"));
-		btnChanges.icon(Icons.get(Icons.CHANGES));
-		add(btnChanges);
-
-		StyledButton btnSettings = new SettingsButton(GREY_TR, Messages.get(this, "settings"));
+		btnSettings = new SettingsButton(GREY_TR, Messages.get(this, "settings"));
 		add(btnSettings);
 
-		StyledButton btnAbout = new StyledButton(GREY_TR, Messages.get(this, "about")){
+		btnAbout = new StyledButton(GREY_TR, Messages.get(this, "about")){
 			@Override
 			protected void onClick() {
 				ShatteredPixelDungeon.switchScene( AboutScene.class );
@@ -187,36 +202,72 @@ public class TitleScene extends PixelScene {
 		GAP = Math.max(GAP, 2);
 
 		float buttonAreaWidth = landscape() ? PixelScene.MIN_WIDTH_L-6 : PixelScene.MIN_WIDTH_P-2;
-		float btnAreaLeft = (Camera.main.width - buttonAreaWidth) / 2f;
+		float btnAreaLeft = insets.left + (w - buttonAreaWidth) / 2f;
 		if (landscape()) {
 			btnPlay.setRect(title.x-50, topRegion+GAP, title.width()+100, BTN_HEIGHT);
 			align(btnPlay);
-			btnRankings.setRect(btnPlay.left(), btnPlay.bottom()+ GAP, (btnPlay.width()*.33f)-1, BTN_HEIGHT);
-			btnBadges.setRect(btnRankings.left(), btnRankings.bottom()+GAP, btnRankings.width(), BTN_HEIGHT);
-			btnNews.setRect(btnRankings.right()+2, btnRankings.top(), btnRankings.width(), BTN_HEIGHT);
-			btnChanges.setRect(btnNews.left(), btnNews.bottom() + GAP, btnRankings.width(), BTN_HEIGHT);
-			btnSettings.setRect(btnNews.right()+2, btnNews.top(), btnRankings.width(), BTN_HEIGHT);
+			btnRankings.setRect(btnPlay.left(), btnPlay.bottom()+ GAP, (btnPlay.width()*.5f)-1, BTN_HEIGHT);
+			btnJournal.setRect(btnRankings.left(), btnRankings.bottom()+GAP, btnRankings.width(), BTN_HEIGHT);
+			btnSettings.setRect(btnRankings.right()+2, btnRankings.top(), btnRankings.width(), BTN_HEIGHT);
 			btnAbout.setRect(btnSettings.left(), btnSettings.bottom() + GAP, btnRankings.width(), BTN_HEIGHT);
 		} else {
-			btnPlay.setRect(btnAreaLeft, topRegion+GAP, buttonAreaWidth, BTN_HEIGHT);
+			btnPlay.setRect(btnAreaLeft, insets.top + topRegion+GAP, buttonAreaWidth, BTN_HEIGHT);
 			align(btnPlay);
 			btnRankings.setRect(btnPlay.left(), btnPlay.bottom()+ GAP, (btnPlay.width()/2)-1, BTN_HEIGHT);
-			btnBadges.setRect(btnRankings.right()+2, btnRankings.top(), btnRankings.width(), BTN_HEIGHT);
-			btnNews.setRect(btnRankings.left(), btnRankings.bottom()+ GAP, btnRankings.width(), BTN_HEIGHT);
-			btnChanges.setRect(btnNews.right()+2, btnNews.top(), btnNews.width(), BTN_HEIGHT);
-			btnSettings.setRect(btnNews.left(), btnNews.bottom()+GAP, btnRankings.width(), BTN_HEIGHT);
+			btnJournal.setRect(btnRankings.right()+2, btnRankings.top(), btnRankings.width(), BTN_HEIGHT);
+			btnSettings.setRect(btnRankings.left(), btnRankings.bottom()+GAP, btnRankings.width(), BTN_HEIGHT);
 			btnAbout.setRect(btnSettings.right()+2, btnSettings.top(), btnSettings.width(), BTN_HEIGHT);
 		}
 
-		BitmapText version = new BitmapText( "v" + Game.version, pixelFont);
+		version = new BitmapText( "v" + Game.version, pixelFont);
 		version.measure();
 		version.hardlight( 0x888888 );
-		version.x = w - version.width() - 4;
-		version.y = h - version.height() - 2;
+		version.x = insets.left + w - version.width() - (DeviceCompat.isDesktop() ? 4 : 8);
+		version.y = insets.top + h - version.height() - (DeviceCompat.isDesktop() ? 2 : 4);
 		add( version );
 
+		btnFade = new IconButton(Icons.CHEVRON.get()){
+			@Override
+			protected void onClick() {
+				enable(false);
+				parent.add(new Tweener(parent, 0.5f) {
+					@Override
+					protected void updateValues(float progress) {
+						if (!btnFade.active) {
+							uiAlpha = 1 - progress;
+							updateFade();
+						}
+					}
+				});
+			}
+		};
+		btnFade.icon().originToCenter();
+		btnFade.icon().angle = 180f;
+		btnFade.setRect(btnAreaLeft + (buttonAreaWidth-16)/2, camera.main.height - 16 - insets.bottom, 16, 16);
+		add(btnFade);
+
+		PointerArea fadeResetter = new PointerArea(0, 0, Camera.main.width, Camera.main.height){
+			@Override
+			public boolean onSignal(PointerEvent event) {
+				if (event != null && event.type == PointerEvent.Type.UP && !btnPlay.active){
+					parent.add(new Tweener(parent, 0.5f) {
+						@Override
+						protected void updateValues(float progress) {
+							uiAlpha = progress;
+							updateFade();
+							if (progress >= 1){
+								btnFade.enable(true);
+							}
+						}
+					});
+				}
+				return false;
+			}
+		};
+		add(fadeResetter);
+
 		if (DeviceCompat.isDesktop()) {
-			ExitButton btnExit = new ExitButton();
+			btnExit = new ExitButton();
 			btnExit.setPos( w - btnExit.width(), 0 );
 			add( btnExit );
 		}
@@ -230,107 +281,45 @@ public class TitleScene extends PixelScene {
 		fadeIn();
 	}
 
-	private void placeTorch( float x, float y ) {
+	private float uiAlpha;
+
+	public void updateFade() {
+		float alpha = GameMath.gate(0f, uiAlpha, 1f);
+
+		title.am = alpha;
+		leftFB.am = alpha;
+		rightFB.am = alpha;
+		//signs.am = alpha; handles this itself
+
+		btnPlay.enable(alpha != 0);
+		btnRankings.enable(alpha != 0);
+		btnJournal.enable(alpha != 0);
+		btnSettings.enable(alpha != 0);
+		btnAbout.enable(alpha != 0);
+
+		btnPlay.alpha(alpha);
+		btnRankings.alpha(alpha);
+		btnJournal.alpha(alpha);
+		btnSettings.alpha(alpha);
+		btnAbout.alpha(alpha);
+
+		version.alpha(alpha);
+		btnFade.icon().alpha(alpha);
+		if (btnExit != null){
+			btnExit.enable(alpha != 0);
+			btnExit.icon().alpha(alpha);
+		}
+
+	}
+
+	private Fireball placeTorch(float x, float y ) {
 		Fireball fb = new Fireball();
 		fb.x = x - fb.width()/2f;
 		fb.y = y - fb.height();
 
 		align(fb);
 		add( fb );
-	}
-
-	private static class NewsButton extends StyledButton {
-
-		public NewsButton(Chrome.Type type, String label ){
-			super(type, label);
-			if (SPDSettings.news()) News.checkForNews();
-		}
-
-		int unreadCount = -1;
-
-		@Override
-		public void update() {
-			super.update();
-
-			if (unreadCount == -1 && News.articlesAvailable()){
-				long lastRead = SPDSettings.newsLastRead();
-				if (lastRead == 0){
-					if (News.articles().get(0) != null) {
-						SPDSettings.newsLastRead(News.articles().get(0).date.getTime());
-					}
-				} else {
-					unreadCount = News.unreadArticles(new Date(SPDSettings.newsLastRead()));
-					if (unreadCount > 0) {
-						unreadCount = Math.min(unreadCount, 9);
-						text(text() + "(" + unreadCount + ")");
-					}
-				}
-			}
-
-			if (unreadCount > 0){
-				textColor(ColorMath.interpolate( 0xFFFFFF, Window.SHPX_COLOR, 0.5f + (float)Math.sin(Game.timeTotal*5)/2f));
-			}
-		}
-
-		@Override
-		protected void onClick() {
-			super.onClick();
-			ShatteredPixelDungeon.switchNoFade( NewsScene.class );
-		}
-	}
-
-	private static class ChangesButton extends StyledButton {
-
-		public ChangesButton( Chrome.Type type, String label ){
-			super(type, label);
-			if (SPDSettings.updates()) Updates.checkForUpdate();
-		}
-
-		boolean updateShown = false;
-
-		@Override
-		public void update() {
-			super.update();
-
-			if (!updateShown && Updates.updateAvailable()){
-				updateShown = true;
-				text(Messages.get(TitleScene.class, "update"));
-			}
-
-			if (updateShown){
-				textColor(ColorMath.interpolate( 0xFFFFFF, Window.SHPX_COLOR, 0.5f + (float)Math.sin(Game.timeTotal*5)/2f));
-			}
-		}
-
-		@Override
-		protected void onClick() {
-			if (Updates.updateAvailable()){
-				AvailableUpdateData update = Updates.updateData();
-
-				ShatteredPixelDungeon.scene().addToFront( new WndOptions(
-						Icons.get(Icons.CHANGES),
-						update.versionName == null ? Messages.get(this,"title") : Messages.get(this,"versioned_title", update.versionName),
-						update.desc == null ? Messages.get(this,"desc") : update.desc,
-						Messages.get(this,"update"),
-						Messages.get(this,"changes")
-				) {
-					@Override
-					protected void onSelect(int index) {
-						if (index == 0) {
-							Updates.launchUpdate(Updates.updateData());
-						} else if (index == 1){
-							ChangesScene.changesSelected = 0;
-							ShatteredPixelDungeon.switchNoFade( ChangesScene.class );
-						}
-					}
-				});
-
-			} else {
-				ChangesScene.changesSelected = 0;
-				ShatteredPixelDungeon.switchNoFade( ChangesScene.class );
-			}
-		}
-
+		return fb;
 	}
 
 	private static class SettingsButton extends StyledButton {
@@ -360,20 +349,6 @@ public class TitleScene extends PixelScene {
 				WndSettings.last_index = 5;
 			}
 			ShatteredPixelDungeon.scene().add(new WndSettings());
-		}
-	}
-
-	private static class SupportButton extends StyledButton{
-
-		public SupportButton( Chrome.Type type, String label ){
-			super(type, label);
-			icon(Icons.get(Icons.GOLD));
-			textColor(Window.TITLE_COLOR);
-		}
-
-		@Override
-		protected void onClick() {
-			ShatteredPixelDungeon.switchNoFade(SupporterScene.class);
 		}
 	}
 }
