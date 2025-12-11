@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.windows;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
+import com.shatteredpixel.shatteredpixeldungeon.Challenges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.SPDAction;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
@@ -491,6 +492,12 @@ public class WndJournal extends WndTabbed {
 		private void updateList(){
 
 			grid.addHeader("_" + Messages.get(this, "title") + "_", 9, true);
+
+			if (Dungeon.isChallenged(Challenges.FORGETFUL)) {
+				grid.addHeader(Messages.get(this, "forgetful"), 6, true);
+				grid.setRect(x, y, width, height);
+				return;
+			}
 
 			grid.addHeader(Messages.get(this, "desc"), 6, true);
 
