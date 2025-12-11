@@ -21,8 +21,6 @@
 
 package com.shatteredpixel.shatteredpixeldungeon.ui;
 
-import com.shatteredpixel.shatteredpixeldungeon.Challenges;
-import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.ShatteredPixelDungeon;
 import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.items.EquipableItem;
@@ -62,13 +60,6 @@ public class CustomNoteButton extends IconButton {
 	@Override
 	protected void onClick() {
 		super.onClick();
-
-		if (Dungeon.isChallenged(Challenges.FORGETFUL)){
-			GameScene.show(new WndTitledMessage(Icons.INFO.get(),
-					Messages.get(this, "forgetful_title"),
-					Messages.get(this, "forgetful_text")));
-			return;
-		}
 
 		if (Notes.getRecords(Notes.CustomRecord.class).size() >= Notes.customRecordLimit()){
 			GameScene.show(new WndTitledMessage(Icons.INFO.get(),
