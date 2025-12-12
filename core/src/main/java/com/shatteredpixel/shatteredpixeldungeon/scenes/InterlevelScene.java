@@ -651,7 +651,12 @@ public class InterlevelScene extends PixelScene {
 				Buff.affect(Dungeon.hero, Forgetful.class);
 			}
 		} else {
-			Mob.holdAllies( Dungeon.level );
+			if (curTransition.destBranch != Dungeon.branch && Dungeon.depth >= 16 && Dungeon.depth <= 20) {
+				//FIXME avoids holding allies when entering city quest area, this is very sloppy though
+				// perhaps holding allies could be a property of the transition?
+			} else {
+				Mob.holdAllies(Dungeon.level);
+			}
 			Dungeon.saveAll();
 
 			Level level;
@@ -690,7 +695,12 @@ public class InterlevelScene extends PixelScene {
 	}
 
 	private void ascend() throws IOException {
-		Mob.holdAllies( Dungeon.level );
+		if (curTransition.destBranch != Dungeon.branch && Dungeon.depth >= 16 && Dungeon.depth <= 20) {
+			//FIXME avoids holding allies when entering city quest area, this is very sloppy though
+			// perhaps holding allies could be a property of the transition?
+		} else {
+			Mob.holdAllies(Dungeon.level);
+		}
 		Dungeon.saveAll();
 
 		Level level;
