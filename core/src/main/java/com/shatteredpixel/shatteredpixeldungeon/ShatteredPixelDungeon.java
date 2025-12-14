@@ -37,12 +37,12 @@ public class ShatteredPixelDungeon extends Game {
 	public static final int v1_2_3 = 628;
 
 	//savegames from versions older than v2.5.4 are no longer supported, and data from them is ignored
-	public static final int v2_5_4 = 802;
+	public static final int v2_5_4 = 787;
 
-	public static final int v3_0_2 = 833;
-	public static final int v3_1_1 = 850;
-	public static final int v3_2_5 = 877;
-	public static final int v3_3_0 = 883;
+	public static final int v3_0_2 = 790;
+	public static final int v3_1_1 = 793;
+	public static final int v3_2_5 = 795;
+	public static final int v3_3_0 = 796;
 	
 	public ShatteredPixelDungeon( PlatformSupport platform ) {
 		super( sceneClass == null ? WelcomeScene.class : sceneClass, platform );
